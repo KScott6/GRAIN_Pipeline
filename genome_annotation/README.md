@@ -60,7 +60,7 @@ There is a column to record the genus of each genome (genus). This column is ref
 
 1) Input genomes needs to be in one folder. 
 
-If you are running this pipeline immediately after the [NCBI genome acquisition pipeline](KScott6/GRAIN_Pipeline/genome_acquisition/README.md), you can simply provide the fna folder path. For example:
+If you are running this pipeline immediately after the [NCBI genome acquisition pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/1bd0fdd5e2fdbb0980dbbe9ce06f1c692c65b500/genome_acquisition/README.md), you can simply provide the fna folder path. For example:
 
 `/project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna`
 
