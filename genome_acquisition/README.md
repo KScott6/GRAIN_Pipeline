@@ -43,12 +43,13 @@ For this example, since the incoming genomes will most likely need to be annotat
 mkdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26
 cd /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26
 
+module load miniconda
 source activate /project/arsef/environments/ncbi_datasets
 ```
 
 Use the fetch_ncbi_metadata_and_merge.py to take incoming search parameters (taxa names or accessions) and prepare for the download. You can give a custom prefix to your output files with --prefix.
 
-You can provide a csv or txt with a list of taxa names (e.g. Ambrosiella, Fusarium virguliforme, etc.), like so:
+You can provide a csv or txt file that is a single-column list of taxa names (e.g. Ambrosiella, Fusarium virguliforme, etc.), like so:
 
 ```bash
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
@@ -59,7 +60,7 @@ python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
   --write_all_fetched
 ```
 
-Or you can provide a csv or txt of NCBI accessions:
+Or you can provide a csv or txt file that is a single-column list of NCBI accessions:
 
 ```bash
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
