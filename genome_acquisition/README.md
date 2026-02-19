@@ -103,7 +103,7 @@ python /project/arsef/scripts/download_ncbi_batches.py \
 
 Congrats! This should result in your genomes and annotations being downloaded in one place. The genome assemblies will be in the "fna" folder and if there were any annotations, they will be in "gff". 
 
-You probably want to annotate your assemblies now - check out the [SCINet Funannotate walkthrough](/genome_annotation/README.md) to get one step closer to incorporating these genomes into the lab MycoTools database. 
+You probably want to annotate your assemblies now - check out the [SCINet Funannotate walkthrough](../genome_annotation/README.md) to get one step closer to incorporating these genomes into the lab MycoTools database. 
 
 <br>
 
