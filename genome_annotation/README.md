@@ -1,6 +1,6 @@
 # Automated Funannotate Pipeline (SCINet / ARSEF)
 
-This walkthrough describes how to run the Funannotate pipeline for one or more fungal genome annotations on SCINet. The input of this pipeline should be *unrestricted* publicly available genomes from NCBI or JGI, or your own genome assemblies which have *passed the NCBI foreign contamination screening*. The output of this pipeline will be the structural annotation (.gff) for each of your input genomes. 
+This walkthrough describes how to run the Funannotate pipeline for one or more fungal genome annotations on SCINet. The input of this pipeline should be *unrestricted* publicly available genomes from NCBI or JGI, or your own genome assemblies which have *passed the NCBI foreign contamination and adapter content screenings*. The output of this pipeline will be the structural annotation (.gff) and protein fasta (.faa) for each of your input genomes. 
 
 This walkthrough will get you one step closer to incorporating genomes assemblies/annotations into our lab's shared MycoTools database.
 
@@ -50,9 +50,9 @@ This file should already exist (/project/arsef/projects/bulk_genome_annotation/p
 
 This file is central to the pipeline - it tracks where each genome is in the pipeline and each script uses it as a reference when determing which genomes are ready for the next step. SCINet job IDs are stored in this progress tracker, as well as the time/dates when each step was verified as being successfully completed.
 
-Each genome is referred to by its "ome code" (OMEcode). The ome code is a SIMPLE (no spaces or special characters besides . or _) prefix, which is used to label each of the intermediate and final output files generated from this pipeline. I recommend using either the NCBI accession number or the unique isolate name as each genome's ome code.
+**(!)** You should assign each genome a unique "ome code" (OMEcode). The ome code is a short and SIMPLE (no spaces or special characters besides . or _) prefix, which is used to label each genome's intermediate and final output files generated from this pipeline. I recommend using either the NCBI accession number or a simplified isolate name as each genome's ome code. Don't worry too much about the name - ultimately this name is temporary. When your final assemblies and annotations are uploaded to the MycoTools database, it will be assigned a permanent code. 
 
-There is a column to record the genus of each genome (genus). This column is referenced during the "funannotate predict" step to determine if we have any extra protein/transcript evidence available for that particular genus. 
+In the master progress tracker, there is a column to record the genus of each genome (genus). This column is referenced during the "funannotate predict" step to determine if we have any extra protein/transcript evidence available for that particular genus. 
 
 ---
 
@@ -142,7 +142,7 @@ You should also fill in the genus information for each genome (required for Step
 
 Fill the genus column for each genome you plan to annotate.
 
-This is critical because Step 4 uses genus to locate evidence files.
+This is critical because Step 4 uses genus to locate the proper protein/transcript evidence files to provide to the "funannotate predict" step.
 
 <br>
 
