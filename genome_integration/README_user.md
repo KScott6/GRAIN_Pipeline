@@ -58,7 +58,7 @@ Additionally, there are many [extra analyses](https://github.com/KScott6/GRAIN_P
 
 Skip this step if you are following the GRAIN pipeline and have your own genome assemblies/annotations in hand already.
 
-MycoTools has the option to download genomes/annotations straight from NCBI and JGI. However, it is limited to only downloading accessions/portals which have BOTH assemblies and annotations. 
+MycoTools has the option to download genomes/annotations straight from NCBI and JGI. However, it is limited to only downloading accessions/portals which have BOTH assemblies and annotations. Even if NCBI genomes have annotations, I prefer using my scripts to integrate them into mycotools (vs downloading via mycotools ncbi_dwld), because my scripts prepare the accession metadata for our metadata catalog.
 
 Note: I've noticed the stored metadata in some rare NCBI accessions will completely break the download step for MycoTools. Who inserts a "\t" into a metadata field??
 
@@ -92,7 +92,6 @@ Similarly, this downloads all the data into the fna and gff3 folder, and creates
 
 You can compile all your predbs into one large predbs, then move forward with one large file, when first initializing a database. 
 
-Note:  You cannot specifiy custom MycoTools ome names when starting a database or adding genomes. 
 
 ---
 
@@ -127,10 +126,13 @@ ome2name concatenated.nex.contree > full_name.tree
 
 ---
 
-## Other Important Notes
+## Other Notes
 
-MycoTools automatically edits out whitespaces/special characters/etc in the strain names. Maybe the complex species names as well?
+* You cannot specifiy custom MycoTools ome names when starting a database or adding genomes. 
 
-I was having problems because I had changed my JGI login info. I couldn't change the actual contents of my passwords manager with mtdb manage, so I deleted the .mycotools folder in my home folder. This allowed me to re-run the "mtdb manage -p" command and re-set my NCBI and JGI info, as well as make a new mycotools password.
+* MycoTools automatically edits out whitespaces/special characters/etc in the strain names. Maybe the complex species names as well?
 
-Try as I might, I cannot get any steps that require the MycoTools password to work as a submitted slurm job. This isn't usually a problem, unless I'm trying to add large numbers of new assemblies/annotations into the databse. I eneded up splitting my large genome submission run into smaller chunks, then running those chunks one by one on the login node.
+* I was having problems because I had changed my JGI login info. I couldn't change the actual contents of my passwords manager with mtdb manage, so I deleted the .mycotools folder in my home folder. This allowed me to re-run the "mtdb manage -p" command and re-set my NCBI and JGI info, as well as make a new mycotools password.
+
+* Try as I might, I cannot get any steps that require the MycoTools password to work as a submitted slurm job. This isn't usually a problem, unless I'm trying to add large numbers of new assemblies/annotations into the databse. I eneded up splitting my large genome submission run into smaller chunks, then running those chunks one by one on the login node.
+
