@@ -19,4 +19,10 @@ Step 2:  Annotate genomes
 
 Step 3: Incorporate genomes
 
-* upload these new genomes assemblies and annotations into the shared lab MycoTools database
+* [upload these new genomes assemblies and annotations into the shared lab MycoTools database](https://github.com/KScott6/GRAIN_Pipeline/blob/a51cc1b9470d76adadf37f83b2d9cc6fcba7c437/genome_integration/README_user.md)
+
+Step 4: Extra Analyses (optional)
+
+* [Running extra analyses](https://github.com/KScott6/GRAIN_Pipeline/blob/a51cc1b9470d76adadf37f83b2d9cc6fcba7c437/extra_analyses/README.md) is optional, but necessary if you want to use my other pipelines (like [cano.py](https://github.com/KScott6/cano.py))
+
+* includes running software like BUSCO
