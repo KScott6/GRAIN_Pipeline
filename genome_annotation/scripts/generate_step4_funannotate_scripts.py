@@ -126,11 +126,6 @@ def parse_args() -> argparse.Namespace:
         default="/90daydata/arsef/output_funannotate",
         help="Base directory for funannotate output (default: /90daydata/arsef/output_funannotate).",
     )
-    p.add_argument(
-        "--tmpdir_base",
-        default="/90daydata/arsef/tmp_funannotate",
-        help="Base directory under which per-job TMPDIRs will be created (default: /90daydata/arsef/tmp_funannotate).",
-    )
 
     # Final destinations
     p.add_argument(
@@ -152,8 +147,8 @@ def parse_args() -> argparse.Namespace:
     # Funannotate settings
     p.add_argument(
         "--busco_db",
-        default="hypocreales_odb10",
-        help="BUSCO lineage name for funannotate predict (default: hypocreales_odb10).",
+        default="fungi_odb10",
+        help="BUSCO lineage name for funannotate predict (default: fungi_odb10).",
     )
     p.add_argument(
         "--run_number",
@@ -176,7 +171,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--partition", default="ceres", help="SLURM partition (default: ceres).")
     p.add_argument("--account", default="arsef", help="SLURM account (default: arsef).")
 
-    # Env / modules (keeps your current conda-based predict)
+    # Env / modules (conda-based predict)
     p.add_argument(
         "--module_load",
         default="module load miniconda",
@@ -187,13 +182,14 @@ def parse_args() -> argparse.Namespace:
         default="/project/arsef/environments/funannotate_working/",
         help="Conda env to activate for funannotate predict (default: /project/arsef/environments/funannotate_working/).",
     )
+    # NOTE: default to blank to avoid breaking env after activation; set if you truly want it.
     p.add_argument(
         "--module_unload",
-        default="module unload miniconda",
-        help='Optional module unload line (default: "module unload miniconda").',
+        default="",
+        help='Optional module unload line (default: empty). Example: "module unload miniconda".',
     )
 
-    # Funannotate env vars (as in your script)
+    # Funannotate env vars
     p.add_argument(
         "--genemark_path",
         default="/project/arsef/environments/__external_software_funannotate/gmes_linux_64_4",
@@ -279,7 +275,6 @@ def sbatch_submit(script_path: Path) -> Tuple[bool, str]:
 
 
 def is_ready_for_step4(row: pd.Series) -> bool:
-    # Step 4 depends on Step 2 having completed (masked genome exists)
     return str(row.get("step2_done", "")).strip() != ""
 
 
@@ -288,7 +283,7 @@ def step4_already_done(row: pd.Series) -> bool:
     return val != "" and val != "FAILED"
 
 
-def gather_evidence_files(evidence_base: Path, genus: str, uniprot_path: Path) -> Tuple[List[Path], List[Path]]:
+def gather_evidence_files(evidence_base: Path, genus: str) -> Tuple[List[Path], List[Path]]:
     """
     Returns (transcripts, proteins) as Path lists.
     UniProt is NOT included here; caller appends it to proteins.
@@ -309,7 +304,6 @@ def gather_evidence_files(evidence_base: Path, genus: str, uniprot_path: Path) -
             for ext in exts:
                 proteins.extend([Path(p) for p in protein_dir.glob(ext)])
 
-    # De-duplicate + sort
     transcripts = sorted({p.resolve() for p in transcripts})
     proteins = sorted({p.resolve() for p in proteins})
 
@@ -331,27 +325,21 @@ def build_slurm_script(
     slurm_err: Path,
     args: argparse.Namespace,
 ) -> str:
-    # Build evidence strings (funannotate accepts multiple paths)
     transcript_block = ""
     if transcripts:
         transcript_block = "--transcript_evidence \\\n  " + " \\\n  ".join(str(p) for p in transcripts) + " \\\n  "
 
-    # Always include UniProt in protein evidence
     all_proteins = proteins + [uniprot_path]
     protein_block = "--protein_evidence \\\n  " + " \\\n  ".join(str(p) for p in all_proteins) + " \\\n  "
 
     force_flag = "--force" if args.force else ""
-
-    # Sample name
     sample_name = f"{ome}_run_{args.run_number}"
 
-    # BUSCO short summary path (funannotate predict_misc layout varies; keep your original target but guarded)
-    # Your original: predict_misc/busco/run_<sample>/short_summary_<sample>.txt
     short_summary_src = out_dir / "predict_misc" / "busco" / f"run_{sample_name}" / f"short_summary_{sample_name}.txt"
     gff_src = out_dir / "predict_results" / f"{sample_name}.gff3"
 
-    # Unique tmpdir created per job under tmpdir_base
-    tmpdir_job = f'{args.tmpdir_base}/{ome}_${{SLURM_JOB_ID}}'
+    unload_line = args.module_unload.strip()
+    unload_block = f"\n{unload_line}\n" if unload_line else "\n"
 
     return f"""#!/bin/bash
 #SBATCH --time={args.time}
@@ -367,9 +355,7 @@ def build_slurm_script(
 set -euo pipefail
 
 {args.module_load}
-source activate {args.conda_env}
-{args.module_unload}
-
+source activate {args.conda_env}{unload_block}
 export GENEMARK_PATH="{args.genemark_path}"
 export FUNANNOTATE_DB="{args.funannotate_db}"
 
@@ -379,10 +365,13 @@ BUSCO_LINEAGE="{args.busco_db}"
 RUN_NUMBER="{args.run_number}"
 CPUS="{args.cpus}"
 
-# Create unique TMPDIR for this job
-export TMPDIR="{tmpdir_job}"
-mkdir -p "$TMPDIR"
-echo "Using TMPDIR: $TMPDIR"
+# Use system-provided TMPDIR; do NOT override it
+echo "System TMPDIR: ${{TMPDIR:-UNSET}}"
+if [ -z "${{TMPDIR:-}}" ]; then
+  echo "ERROR: TMPDIR is not set. Refusing to run funannotate without node-local scratch."
+  exit 1
+fi
+ls -ld "$TMPDIR" || true
 
 # Prepare output directory
 rm -rf "{out_dir}"
@@ -404,29 +393,23 @@ mkdir -p "{final_out_dir}"
 mkdir -p "{short_summary_dest}"
 mkdir -p "{gff_dest}"
 
-# Copy predict_results contents into per-OME final folder
 if [ -d "{out_dir}/predict_results" ]; then
   cp -r "{out_dir}/predict_results/"* "{final_out_dir}/" || true
 else
   echo "No predict_results directory found for {ome}"
 fi
 
-# Copy BUSCO short summary (guarded)
 if [ -f "{short_summary_src}" ]; then
   cp "{short_summary_src}" "{short_summary_dest}/" || true
 else
   echo "Missing BUSCO short summary for {ome}: {short_summary_src}"
 fi
 
-# Copy GFF3 (guarded)
 if [ -f "{gff_src}" ]; then
   cp "{gff_src}" "{gff_dest}/" || true
 else
   echo "Missing GFF3 for {ome}: {gff_src}"
 fi
-
-# Optional: cleanup tmpdir
-rm -rf "$TMPDIR" || true
 """
 
 
@@ -434,7 +417,11 @@ def main() -> None:
     args = parse_args()
 
     project_dir = Path(args.project_dir).resolve()
-    progress_file = Path(args.progress_file).resolve() if args.progress_file else (project_dir / "progress" / "annotation_master_progress.tsv")
+    progress_file = (
+        Path(args.progress_file).resolve()
+        if args.progress_file
+        else (project_dir / "progress" / "annotation_master_progress.tsv")
+    )
 
     script_output_dir = project_dir / "scripts" / "step4_funannotate"
     log_output_dir = project_dir / "logs" / "step4_funannotate"
@@ -455,17 +442,14 @@ def main() -> None:
 
     df = load_or_init_progress(progress_file)
 
-    # Determine target OMEs
     if args.ome_list:
         ome_list = read_ome_list_file(Path(args.ome_list).resolve())
         for ome in ome_list:
             if not (df["OMEcode"] == ome).any():
                 df = update_progress_row(df, ome, {"note": "Added for step4 selection"})
     else:
-        # All ready per progress TSV
         ome_list = df.loc[df.apply(is_ready_for_step4, axis=1), "OMEcode"].astype(str).tolist()
 
-    # Filter out already-done unless requested
     if not args.include_done:
         filtered: List[str] = []
         for ome in ome_list:
@@ -496,10 +480,9 @@ def main() -> None:
             df = update_progress_row(df, ome, {"note": "Missing masked fasta for Step 4"})
             continue
 
-        transcripts, proteins = gather_evidence_files(evidence_base, genus, uniprot_path)
+        transcripts, proteins = gather_evidence_files(evidence_base, genus)
 
         if not proteins:
-            # You'll still have UniProt added later, but this warns you genus-specific protein evidence is absent
             print(f"[WARNING] No genus-specific protein evidence for genus '{genus}' ({ome}). UniProt will still be used.")
 
         out_dir = out_base / f"{ome}_output"
