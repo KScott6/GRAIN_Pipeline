@@ -14,6 +14,8 @@ A predb is a tsv file with the accession information, assembly and annotations p
 
 **Important note:** You will need to specify where each new assembly/annotation came from; either from "ncbi", "jgi", or "new" from your own lab. I have put down all the NCBI assemblies with OUR annotations as "new" and you should do the same.  
 
+<br>
+
 ### Step 2: curate the predb into a mtdb
 
 ```bash
@@ -29,6 +31,12 @@ mtdb predb2mtdb [path to .predb]
 ```
 
 This command will create a mtdb labeled with the date, like:  /project/arsef/mycotools_test/jgi_download/predb2mtdb_20250417/predb2mtdb.mtdb
+
+This step is also standardizing the input files - renaming contigs, files, etc. Strain names will have special characters and whitespaces removed, as will "complex" species names (e.g. "oxysporum f. sp. lycopersici" -> "oxysporumfsplycopersici").
+
+It's pretty fast for individual genomes, about 15-20 seconds per genome on the login node. Adds up quickly though! If you want to incoporate a LOT of genomes (>100), it may be best to split these up into multiple input datasets.
+
+<br>
 
 ### Step 3 : integrating the mtdb
 
@@ -130,7 +138,7 @@ ome2name concatenated.nex.contree > full_name.tree
 
 * You cannot specifiy custom MycoTools ome names when starting a database or adding genomes. 
 
-* MycoTools automatically edits out whitespaces/special characters/etc in the strain names. Maybe the complex species names as well?
+* MycoTools automatically edits out whitespaces/special characters/etc in the strain names, as wella as complex species names.
 
 * I was having problems because I had changed my JGI login info. I couldn't change the actual contents of my passwords manager with mtdb manage, so I deleted the .mycotools folder in my home folder. This allowed me to re-run the "mtdb manage -p" command and re-set my NCBI and JGI info, as well as make a new mycotools password.
 

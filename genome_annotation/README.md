@@ -64,7 +64,7 @@ If you are running this pipeline immediately after the [NCBI genome acquisition 
 
 `/project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna`
 
-2) Rename genome input files.
+2) Rename genome input files, if needed.
    
 The file names need to be in this exact format:
 
@@ -82,7 +82,7 @@ done
 
 3) Make sure input genomes are in their final form.
 
-If you are adding genomes of your own creation (rather than downloaded from NCBI), I highly recommend that they are in their FINAL form. Submit them to NCBI so they confirm the genomes do not have contamination, or process them with [NCBI FCS](https://github.com/ncbi/fcs) yourself. 
+If you are adding genomes of your own creation (rather than downloaded from NCBI), I highly recommend that they are in their FINAL form. Submit them to NCBI so they confirm the genomes do not have any contamination, or process them with [NCBI FCS](https://github.com/ncbi/fcs) yourself. 
 
 4) Create your input list.
 
