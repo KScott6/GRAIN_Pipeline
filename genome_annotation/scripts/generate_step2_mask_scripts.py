@@ -213,6 +213,10 @@ def build_slurm_script(
 ) -> str:
     repeat_fa = prep_dir / f"{ome}-families.fa"
 
+    # Destination for storing all sorted+masked genomes
+    sorted_masked_dest = project_dir / "needs_annotation" / "final_funannotate_results" / "sorted_masked_genomes"
+    masked_src = prep_dir / f"{ome}.masked.fasta"
+
     return f"""#!/bin/bash
 #SBATCH --time={args.time}
 #SBATCH --nodes={args.nodes}
@@ -247,6 +251,14 @@ cp "{repmod_dir}/{ome}-families.fa" "{repmod_dir}/{ome}-families.stk" "{repmod_d
 # Softmask with funannotate (uses the RepeatModeler library)
 cd "{prep_dir}"
 funannotate mask -i "{sort_input}" -m repeatmodeler -l "{repeat_fa}" -o "{ome}.masked.fasta" --cpus {args.ntasks_per_node}
+
+# Copy final sorted+masked genome into shared folder
+mkdir -p "{sorted_masked_dest}"
+if [ -f "{masked_src}" ]; then
+  cp "{masked_src}" "{sorted_masked_dest}/" || true
+else
+  echo "Missing masked fasta for {ome}: {masked_src}"
+fi
 """
 
 

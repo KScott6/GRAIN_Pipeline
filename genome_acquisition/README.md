@@ -78,7 +78,9 @@ Either option will result in several output files:
 2) <prefix>.<accessions/taxa>.MASTER_UPDATED.csv : an unpolished but updated metadata file that includes all the old genomes info, as well as any new unique genome accessions and their metadata. 
    
 3) <prefix>.<accessions/taxa>.NEW_ONLY.tsv : a list of the accessions that passed the deduplication step.
-   
+
+Take a look at the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file. If you don't want to progress with any specific accession, you can simply delete that row from this file, save the file, and progress in this pipeline.
+
 <br>
 
 ## Step 2 - download the genome assemblies (optionally, their annotations as well)

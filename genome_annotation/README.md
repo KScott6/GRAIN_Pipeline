@@ -210,6 +210,17 @@ It also provides additional protein/transcript evidence specific to the genome's
 
 By default, generate_step4_funannotate_scripts.py generates jobs scripts but does not submit them unless you include --submit in your command.
 
+Step 4 uses an intermediate output folder on /90daydata (scratch storage) and then copies the final results to:
+
+* needs_annotation/final_funannotate_results/by_ome/<OME>/
+
+* needs_annotation/final_funannotate_results/busco_short_summaries/
+
+* needs_annotation/final_funannotate_results/gff3/
+
+* needs_annotation/final_funannotate_results/assembly_funannotate_output
+
+
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step4_funannotate_scripts.py \
   --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/input_omes.txt \
@@ -221,14 +232,6 @@ Once the annotation jobs are complete, you can update the progress sheet with th
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/update_step4_progress.py
 ```
-
-Step 4 uses an intermediate output folder on /90daydata (scratch storage) and then copies the final results to:
-
-* needs_annotation/final_funannotate_results/by_ome/<OME>/
-
-* needs_annotation/final_funannotate_results/busco_short_summaries/
-
-* needs_annotation/final_funannotate_results/gff3/
 
 <br> 
 

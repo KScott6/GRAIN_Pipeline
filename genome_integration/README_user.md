@@ -10,7 +10,7 @@ My documentation for setting up and maintaining the SCINet/ARSEF MycoTools datab
 
 ### Step 1 : make the predb
 
-A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one using the commands from MycoTools yourself, make one yourself (follow (example predb file)[genome_integration/examples/example.predb]), or just use the output predb provided by the GRAIN acqusition or annotation steps. 
+A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one using the commands from MycoTools yourself, make one yourself (follow [example predb file](genome_integration/examples/example.predb)), or just use the output predb provided by the GRAIN acqusition or annotation steps. 
 
 **Important note:** You will need to specify where each new assembly/annotation came from; either from "ncbi", "jgi", or "new" from your own lab. I have put down all the NCBI assemblies with OUR annotations as "new" and you should do the same.  
 

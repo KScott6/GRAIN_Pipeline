@@ -16,6 +16,7 @@ and then copies key results to final locations:
   final_funannotate_results/by_ome/<OME>/
   final_funannotate_results/busco_short_summaries/
   final_funannotate_results/gff3/
+  final_funannotate_results/assembly_funannotate_output/
 
 Selection logic
 ---------------
@@ -321,6 +322,7 @@ def build_slurm_script(
     final_out_dir: Path,
     short_summary_dest: Path,
     gff_dest: Path,
+    assembly_dest: Path,
     slurm_out: Path,
     slurm_err: Path,
     args: argparse.Namespace,
@@ -341,7 +343,11 @@ def build_slurm_script(
     unload_line = args.module_unload.strip()
     unload_block = f"\n{unload_line}\n" if unload_line else "\n"
 
-    return f"""#!/bin/bash
+    # Assembly produced by funannotate predict (copied into final_out_dir earlier in this script)
+    assembly_src_final = final_out_dir / f"{sample_name}.scaffolds.fa"
+    assembly_dest_final = assembly_dest / f"{ome}.scaffolds.fa"
+
+    return f"""#!/bin/bash -l
 #SBATCH --time={args.time}
 #SBATCH --nodes={args.nodes}
 #SBATCH --ntasks-per-node={args.ntasks_per_node}
@@ -410,6 +416,16 @@ if [ -f "{gff_src}" ]; then
 else
   echo "Missing GFF3 for {ome}: {gff_src}"
 fi
+
+# Copy + rename final funannotate assembly into shared assembly folder
+mkdir -p "{assembly_dest}"
+if [ -f "{assembly_src_final}" ]; then
+  cp "{assembly_src_final}" "{assembly_dest_final}" || true
+else
+  echo "Missing final funannotate scaffolds assembly for {ome}: {assembly_src_final}"
+fi
+
+
 """
 
 
@@ -433,6 +449,9 @@ def main() -> None:
     final_by_ome_dir = Path(args.final_by_ome_dir).resolve() if args.final_by_ome_dir else (project_dir / "needs_annotation" / "final_funannotate_results" / "by_ome")
     short_summary_dest = Path(args.short_summary_dest).resolve() if args.short_summary_dest else (project_dir / "needs_annotation" / "final_funannotate_results" / "busco_short_summaries")
     gff_dest = Path(args.gff_dest).resolve() if args.gff_dest else (project_dir / "needs_annotation" / "final_funannotate_results" / "gff3")
+
+    # Shared folder to store final funannotate assemblies
+    assembly_dest = project_dir / "needs_annotation" / "final_funannotate_results" / "assembly_funannotate_output"
 
     uniprot_path = Path(args.uniprot_path).resolve()
 
@@ -503,6 +522,7 @@ def main() -> None:
             final_out_dir=final_out_dir,
             short_summary_dest=short_summary_dest,
             gff_dest=gff_dest,
+            assembly_dest=assembly_dest,
             slurm_out=slurm_out,
             slurm_err=slurm_err,
             args=args,

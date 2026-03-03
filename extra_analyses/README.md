@@ -30,7 +30,15 @@ This walkthrough will show you how to run all of these analyses automatically, t
 
 ## BUSCO (fungi)
 
-I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that automatically takes either 1) the mtdb produced when you run predb2mtdb, 2) a list of ome codes, or 3) literally any tsv/csv whose first column is a list of ome codes (no header). This script will then run a BUSCO analysis (fungi_osb10) on each genome and the output will automatically be formatted for use in cano.py (you will still need to do extra steps to integrate the BUSCO output into the metadata catalog).
+I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that automatically takes either 
+
+1) the mtdb produced when you run predb2mtdb, 
+
+2) a list of ome codes, or 
+
+3) literally any tsv/csv whose first column is a list of ome codes (no header). 
+
+This script will then run a BUSCO analysis (fungi_osb10) on each genome and the output will automatically be formatted for use in cano.py (you will still need to do extra steps to integrate the BUSCO output into the metadata catalog).
 
 ```bash
 module load miniconda
@@ -44,7 +52,7 @@ If "--skip-existing" is specified, the script will skip any ome that already has
 
 This script will log any ome that did not successfully complete the BUSCO analyses, so that you can re-run them with more time/RAM. 
 
-After all the BUSCO jobs have completed, now you can parse the BUSCO txt output with the BUSCO parsing script:
+After all the BUSCO jobs have completed, now you need to parse the BUSCO txt output with the BUSCO parsing script:
 
 ```bash
 python /project/arsef/databases/mycotools/database_stats/busco/fungi/parse_busco_summaries.py
@@ -73,7 +81,7 @@ Options:
 
 `--taxonomy` Path to the taxonomy output
 
-`--busco` Path to the output of the parse_busco_summaries.py script. By default, should be "/project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv"
+`--busco` Path to the output of the parse_busco_summaries.py script. By default, should be "/project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv". You need to have run the "parse_busco_summaries.py" script first!
 
 `--annotationStats` Path to the output of MycoTools' annotationStats command. 
 
