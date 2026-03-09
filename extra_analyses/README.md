@@ -38,12 +38,12 @@ I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that 
 
 3) literally any tsv/csv whose first column is a list of ome codes (no header). 
 
-This script will then run a BUSCO analysis (fungi_osb10) on each genome and the output will automatically be formatted for use in cano.py (you will still need to do extra steps to integrate the BUSCO output into the metadata catalog).
+This script will then run a BUSCO analysis (fungi_odb10) on each genome.
 
 ```bash
 module load miniconda
 
-/project/arsef/databases/mycotools/database_stats/busco/fungi/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260226/predb2mtdb.mtdb --submit --skip-existing
+python3 /project/arsef/databases/mycotools/database_stats/busco/fungi/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260307/predb2mtdb.mtdb --submit --skip-existing
 ```
 
 Leave off the "--submit" if you want to preview the created BUSCO job scripts without running them. 
@@ -68,7 +68,13 @@ This will automatically parse the folder with all the collected BUSCO results (/
 Here is how I integrate the results from the extra analyses into the metadata catalog. This can be done all at once, for all necessary analyses, or it can be performed after every analysis. In any case, this script will avoid overwriting any data that is already in the catalog. It will only ever submit information to a completely empty field. 
 
 ```bash
-python /project/arsef/databases/mycotools/scripts/submit_metadata.py --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.08.25.csv   --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv
+python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
+  --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
+  --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
+  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260307.mtdb \
+  --ncbi_metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
+  --report /project/arsef/databases/mycotools/metadata_merge_report.txt
 ```
 
 Options:
@@ -77,14 +83,22 @@ Options:
 
 `--quast` Path to the QUAST output for your new samples
 
-`--ncbi_data` Path to the ncbi metadata
+`--ncbi_metadata` Path to the ncbi metadata
 
-`--taxonomy` Path to the taxonomy output
+`--mtdb` Path to the current MycoTools database mtdb file 
 
-`--busco` Path to the output of the parse_busco_summaries.py script. By default, should be "/project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv". You need to have run the "parse_busco_summaries.py" script first!
+`--busco` Path to the output of the parse_busco_summaries.py script. By default, should be "/project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv". You need to have run the "parse_busco_summaries.py" script to get an update busco results sheet first!
 
 `--annotationStats` Path to the output of MycoTools' annotationStats command. 
 
+This can take a really long time, espcially if you're trying to integrate large amounts of new metatdata. You can speed things up by only integrating one type of metadata at a time:
+
+```bash
+python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
+  --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
+  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260305.mtdb \
+  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.merged.csv
+```
 
 This command will generate a new metadata catalog with the suffix ".merged". You should check this new file, making sure everything looks good. Once verified, you can rename this new file with the current date - **this is now the current version of the metadata catalog**. Move the old version of the catalog into: /project/arsef/databases/mycotools/outdated_metadata_catalogs
 

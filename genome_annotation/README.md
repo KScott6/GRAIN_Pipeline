@@ -50,7 +50,11 @@ This file should already exist (/project/arsef/projects/bulk_genome_annotation/p
 
 This file is central to the pipeline - it tracks where each genome is in the pipeline and each script uses it as a reference when determing which genomes are ready for the next step. SCINet job IDs are stored in this progress tracker, as well as the time/dates when each step was verified as being successfully completed.
 
-**(!)** You should assign each genome a unique "ome code" (OMEcode). The ome code is a short and SIMPLE (no spaces or special characters besides . or _) prefix, which is used to label each genome's intermediate and final output files generated from this pipeline. I recommend using either the NCBI accession number or a simplified isolate name as each genome's ome code. Don't worry too much about the name - ultimately this name is temporary. When your final assemblies and annotations are uploaded to the MycoTools database, it will be assigned a permanent code. 
+**(!)** Each incoming genome should be assigned a unique "ome code" (OMEcode). It will be used to label each genome's intermediate and final output files generated from this pipeline.
+
+If you obtained your genomes from the GRAIN genome retrieval step (NCBI), this ome code is already assigend (the NCBI accession). 
+
+If you are annotating a genome from another source, you need to assing your own ome code to your incoming genome. This ome code should be a short and SIMPLE (no spaces or special characters besides . or _) prefix.  I recommend using the simplified isolate name as each genome's ome code. Don't worry too much about the ome code - this name is important but temporary. When your final assemblies and annotations are uploaded to the MycoTools database, it will be assigned a permanent code. 
 
 In the master progress tracker, there is a column to record the genus of each genome (genus). This column is referenced during the "funannotate predict" step to determine if we have any extra protein/transcript evidence available for that particular genus. 
 
@@ -60,7 +64,7 @@ In the master progress tracker, there is a column to record the genus of each ge
 
 1) Input genomes needs to be in one folder. 
 
-If you are running this pipeline immediately after the [NCBI genome acquisition pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/1bd0fdd5e2fdbb0980dbbe9ce06f1c692c65b500/genome_acquisition/README.md), you can simply provide the fna folder path. For example:
+If you are running this pipeline immediately after the [NCBI genome retrieval pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/1bd0fdd5e2fdbb0980dbbe9ce06f1c692c65b500/genome_retrieval/README.md), you can simply provide the fna folder path. For example:
 
 `/project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna`
 
@@ -109,8 +113,8 @@ Here is an example:
 module load miniconda
 
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step1_sort_scripts.py \
---fna_input_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna \
---ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/input_omes.txt
+--fna_input_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/fna \
+--ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/accessions_to_annotate.txt
 ```
 
 Useful options:
@@ -136,13 +140,26 @@ python /project/arsef/projects/bulk_genome_annotation/commands/update_step1_prog
 
 This will verify outputs exist and populate the step1_done column for genomes that finished successfully.
 
-You should also fill in the genus information for each genome (required for Step 4 evidence). After Step 1, open: 
+
+### Integrating genus metadata into progress tracker
+
+Now that you have your genomes in the progress tracker, you will see that they have empty fields in the "genus" column. This information is essential and will be used to find the appropriate supporting evidence (protein, transcript) in the actual "funannotate predict" step. 
+
+If you are trying to annotate genomes from NCBI and you obtained them using the GRAIN pipeline, you can add the genus information by providing their accession metadata, like this:
+
+```bash
+python3 /project/arsef/scripts/fill_progress_from_metadata.py \
+  --progress /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv \
+  --metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv
+```
+
+Otherwise, you should manually fill in the genus information for each incoming genome. After you have run Step 1, open: 
 
 /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv
 
-Fill the genus column for each genome you plan to annotate.
+And fill the genus column for each genome you plan to annotate.
 
-This is critical because Step 4 uses genus to locate the proper protein/transcript evidence files to provide to the "funannotate predict" step.
+
 
 <br>
 
@@ -156,9 +173,11 @@ The important files generated from this step are copied safely into: needs_annot
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step2_mask_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/input_omes.txt
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py/accessions_to_annotate.txt
 ```
-
+#/project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py/accessions_to_annotate.txt
+#/project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/accessions_to_annotate.txt
+#
 Useful options (although you'll probably never change the defaults):
 
 `--no_submit` Will generate the slurm job scripts, but not submit them. 
@@ -223,7 +242,7 @@ Step 4 uses an intermediate output folder on /90daydata (scratch storage) and th
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step4_funannotate_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/input_omes.txt \
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/annotate_ome_list_3.8.26.txt \
   --submit
 ```
 
@@ -237,7 +256,27 @@ python /project/arsef/projects/bulk_genome_annotation/commands/update_step4_prog
 
 And the bulk genome annotation pipeline is now complete!
 
-You probably want to add these assemblies and annotations to the lab's MycoTools database now. 
+You probably want to add these assemblies and annotations to the lab's MycoTools database now - you will need a predb file for this. 
 
+If you obtained these genomes from NCBI via the GRAIN retrieval step, you can easily make a predb file by providing:
 
+1) a list of the accessions you want to move into the MycoTools database
+
+2) a path to the NCBI metadata file(s) from the retrieval step
+
+```bash
+python /project/arsef/scripts/make_predb_from_annotated_genomes.py \
+  --input_list /project/arsef/projects/bulk_genome_annotation/complete_accessions_3.7.26.txt \
+  --metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py_OLD/new_genomes.taxa.NEW_ONLY.tsv /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  --out /project/arsef/databases/mycotools/split_predb/3.7.26.predb
+
+```
+
+`--input_list` path to a single-column list of accessions that completed the funannotate pipeline
+
+`--metadata` The paths (separated by spaces, if >1) to one or more NCBI metadata sheets that you obtained during the retrieval step
+
+`--out` The output path to your desired predb file
+
+If there is any missing information for any accession (fna, gff, genus, species, strain, etc), that accession will be skipped and not included in the predb.
 
