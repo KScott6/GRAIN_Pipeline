@@ -72,9 +72,12 @@ python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
   --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
   --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260307.mtdb \
-  --ncbi_metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
-  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
-  --report /project/arsef/databases/mycotools/metadata_merge_report.txt
+  --ncbi_metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  --report /project/arsef/databases/mycotools/metadata_merge_report.txt \
+  --add_taxonomy \
+  --entrez_email your_email@cornell.edu \
+  --entrez_api_key YOUR_NCBI_API_KEY \
+  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.taxonomy.csv
 ```
 
 Options:
@@ -91,14 +94,43 @@ Options:
 
 `--annotationStats` Path to the output of MycoTools' annotationStats command. 
 
+`--add_taxonomy` include this flag if you want to fill in the columns for phylum, class, order, and family. Requires a entrez email with "--entrez_email" and is greatly benefitted by supplying your NCBI API key with "--entrez_api_key"
+
+`--entrez_email` provide your entrez email to obtain taxonomy via NCBI
+
+`--entrez_api_key` (optional) Provide your NCBI API key to greatly speed up taxonomy lookup
+
+
+
 This can take a really long time, espcially if you're trying to integrate large amounts of new metatdata. You can speed things up by only integrating one type of metadata at a time:
 
 ```bash
 python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
-  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260305.mtdb \
-  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.merged.csv
+  --add_taxonomy \
+  --entrez_email scott.1907@osu.edu \
+  --entrez_api_key X \
+  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv
 ```
 
 This command will generate a new metadata catalog with the suffix ".merged". You should check this new file, making sure everything looks good. Once verified, you can rename this new file with the current date - **this is now the current version of the metadata catalog**. Move the old version of the catalog into: /project/arsef/databases/mycotools/outdated_metadata_catalogs
 
+
+---
+
+
+# Other fun scripts
+
+Here are a few other scripts that work with the GRAIN/MycoTools workflow. 
+
+## Append full taxonomy data to tree tip labels
+
+Input must be tree (.tree, .newick) with only OME codes as tip labels. Depends on the full taxonomy information being present in the supplied metadata catalog file (see the --add_taxonomy flag in the submit_metadata.py metadata integration script).
+
+```bash
+python /project/arsef/databases/mycotools/scripts/add_taxonomy_to_tree.py \
+    -i /project/arsef/projects/asilomar_project/canopy/prelim/final_tree/final_tree.contree \
+    --levels phylum,class,order,family,genus,species \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.09.26.csv \
+    -o /project/arsef/projects/asilomar_project/canopy/prelim/final_tree/asilomar_prelim_canopy_final_tree_taxonomy.tree
+```
