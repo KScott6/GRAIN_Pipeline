@@ -113,8 +113,9 @@ Here is an example:
 module load miniconda
 
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step1_sort_scripts.py \
---fna_input_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/ncbi_metadata_by_taxa_py/fna \
---ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/accessions_to_annotate.txt
+--fna_input_dir /project/arsef/projects/collab/costa_rica/final_ncbi_assemblies \
+--ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/costa_rica/CR_mycena_ome.txt
+
 ```
 
 Useful options:
@@ -173,7 +174,7 @@ The important files generated from this step are copied safely into: needs_annot
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step2_mask_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py/accessions_to_annotate.txt
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/costa_rica/CR_mycena_ome.txt
 ```
 #/project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py/accessions_to_annotate.txt
 #/project/arsef/projects/bulk_genome_annotation/needs_annotation/Ceratocystidaceae/accessions_to_annotate.txt
@@ -242,7 +243,7 @@ Step 4 uses an intermediate output folder on /90daydata (scratch storage) and th
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step4_funannotate_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/annotate_ome_list_3.8.26.txt \
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/costa_rica/CR_ome_list.txt \
   --submit
 ```
 
