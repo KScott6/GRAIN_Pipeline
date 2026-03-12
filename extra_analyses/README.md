@@ -106,7 +106,7 @@ This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The
 ```bash
 module load miniconda
 
-python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260307/predb2mtdb.mtdb --submit --skip-existing
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/problem_busco_omes.txt --submit --skip-existing
 ```
 
 Leave off the "--submit" if you want to preview the created BUSCO job scripts without running them. 
@@ -136,10 +136,11 @@ This command will generate a new metadata catalog with a custom name of your cho
 ```bash
 python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.csv \
-  --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
   --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260307.mtdb \
+  --quast /project/arsef/databases/mycotools/database_stats/quast/quast_summary_combined.tsv \
+  --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
   --ncbi_metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
-  --report /project/arsef/databases/mycotools/metadata_merge_report.txt \
+  --annotation_stats /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.11.26.tsv \
   --add_taxonomy \
   --entrez_email your_email@cornell.edu \
   --entrez_api_key YOUR_NCBI_API_KEY \
@@ -173,8 +174,8 @@ Updating the metadata catalog can take a really long time, espcially if you're t
 ```bash
 python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.csv \
-  --annotation_stats /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.11.26.tsv \
-  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.annotationstats.csv
+  --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
+  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.busco.csv
 ```
 
 <br>

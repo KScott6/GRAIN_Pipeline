@@ -243,9 +243,13 @@ Step 4 uses an intermediate output folder on /90daydata (scratch storage) and th
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step4_funannotate_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/costa_rica/CR_ome_list.txt \
-  --submit
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/costa_rica/CR_ome_redo.txt \
+  --resume
 ```
+
+`--resume` When this flag is included, the script will attempt to resume any incomplete funannotate runs rather than starting from scratch.
+
+`--submit` Include this flag to subimt created job scripts.
 
 Once the annotation jobs are complete, you can update the progress sheet with this command:
 

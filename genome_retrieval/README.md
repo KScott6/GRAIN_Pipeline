@@ -35,16 +35,12 @@ You will need access to the ncbi_datasets software. If you are on SCINet you can
 
 With the fetch_ncbi_metadata_and_merge.py script, you will provide either a list of taxa or a list of accessions (txt or csv). 
 
-If you provide the path to the lab's genome metadata sheet (make sure you're using the most recent version!), the script will automatically deduplicate any incoming genome data. If you do NOT provide a link to a metadata sheet, the script will fetch metadata for any genome matching your desired taxa/accessions, without performing deduplication.
+If you provide the path to the lab's genome metadata catalog (make sure you're using the most recent version!), the script will automatically deduplicate any incoming genome data. If you do NOT provide a link to a metadata sheet, the script will fetch metadata for any genome matching your desired taxa/accessions, without performing deduplication.
 
-For this example, since the incoming genomes will most likely need to be annotated before being incorporated into MycoTools, I will run this script in the project folder that is associated with our bulk genome annotation pipeline. 
-
+I like to organize all the genome retrieval output in the ./bulk_genome_annotation/genome_retrieval folder, separated by data of retrieval.
 ```bash
-mkdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26
-cd /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26
-
-module load miniconda
-source activate /project/arsef/environments/ncbi_datasets
+mkdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.12.26
+cd /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.12.26
 ```
 
 Use the fetch_ncbi_metadata_and_merge.py to take incoming search parameters (taxa names or accessions) and prepare for the download. You can give a custom prefix to your output files with --prefix.
@@ -52,6 +48,9 @@ Use the fetch_ncbi_metadata_and_merge.py to take incoming search parameters (tax
 You can provide a csv or txt file that is a single-column list of taxa names (e.g. Ambrosiella, Fusarium virguliforme, etc.), like so:
 
 ```bash
+module load miniconda
+source activate /project/arsef/environments/ncbi_datasets
+
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
   --taxa_file /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/desired_taxa.txt \
   --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.08.25.csv \
