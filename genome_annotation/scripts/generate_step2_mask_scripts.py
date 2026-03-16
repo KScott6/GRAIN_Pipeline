@@ -83,7 +83,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--ome_list",
         default=None,
-        help="Path to a text file with one OME code per line. If omitted, uses all genomes ready per progress TSV.",
+        help="Path to a text file with one OME code per line. If omitted, uses all genomes ready in the  progress TSV.",
     )
 
     # Behavior toggles
@@ -126,8 +126,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--conda_env",
-        default="/project/arsef/environments/funannotate",
-        help="Conda environment path to activate (default: /project/arsef/environments/funannotate).",
+        default="/project/arsef/environments/funannotate_working",
+        help="Conda environment path to activate (default: /project/arsef/environments/funannotate_working).",
     )
     p.add_argument(
         "--blast_usage_report",
@@ -213,11 +213,11 @@ def build_slurm_script(
 ) -> str:
     repeat_fa = prep_dir / f"{ome}-families.fa"
 
-    # Destination for storing all sorted+masked genomes
+    # destination for storing all sorted+masked genomes
     sorted_masked_dest = project_dir / "needs_annotation" / "final_funannotate_results" / "sorted_masked_genomes"
     masked_src = prep_dir / f"{ome}.masked.fasta"
 
-    return f"""#!/bin/bash
+    return f"""#!/bin/bash -l
 #SBATCH --time={args.time}
 #SBATCH --nodes={args.nodes}
 #SBATCH --ntasks-per-node={args.ntasks_per_node}
@@ -283,12 +283,12 @@ def main() -> None:
     # Determine target OMEs
     if args.ome_list:
         ome_list = read_ome_list_file(Path(args.ome_list).resolve())
-        # Ensure those OMEs exist in progress, but don’t require they already be present
+        # make sure those OMEs exist in progress, but don’t require they already be present
         for ome in ome_list:
             if not (progress_df["OMEcode"] == ome).any():
                 progress_df = update_progress_row(progress_df, ome, {"note": "Added for step2 selection"})
     else:
-        # Use all ready-for-step2 based on progress TSV
+        # use all ready-for-step2 based on progress TSV
         ome_list = progress_df.loc[progress_df.apply(is_ready_for_step2, axis=1), "OMEcode"].astype(str).tolist()
 
     # Filter out already-done step2 unless requested

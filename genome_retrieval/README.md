@@ -67,8 +67,22 @@ python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
   --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.08.25.csv \
   --outdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_acc \
   --prefix new_genomes \
+  --keep_raw_organism_name \
   --write_all_fetched
 ```
+
+
+```bash
+python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
+  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/metadata_update/accession_list.txt \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/metadata_update \
+  --prefix metadata_update \
+  --keep_raw_organism_name \
+  --write_all_fetched
+```
+
+
+`--keep_raw_organism_name` keeps the raw "organism" name reported by NCBI. Recommended to use this flag, for recordkeeping purposes. 
 
 Either option will result in several output files:
 

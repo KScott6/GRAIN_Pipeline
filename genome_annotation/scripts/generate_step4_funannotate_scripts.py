@@ -57,7 +57,7 @@ Notes
 - Genus-specific evidence is pulled from:
     <evidence_base>/transcript/<genus>/
     <evidence_base>/protein/<genus>/
-- This version creates a unique TMPDIR per job under --tmpdir_base.
+- For SCINet, DO NOT create a unique TMPDIR per job under --tmpdir_base. You will crash the nodes and get an unhappy email. Use $TMPDIT instead.
 """
 
 from __future__ import annotations
@@ -535,10 +535,10 @@ def main() -> None:
             ok, job_or_err = sbatch_submit(slurm_script_path)
             if ok:
                 df = update_progress_row(df, ome, {"step4_job": job_or_err, "step4_done": "", "note": ""})
-                print(f"[✓] Submitted Step 4 for {ome}: Job {job_or_err}")
+                print(f"Submitted Step 4 for {ome}: Job {job_or_err}")
             else:
                 df = update_progress_row(df, ome, {"step4_job": "FAILED", "step4_done": "FAILED", "note": f"step4 submission failed: {job_or_err}"})
-                print(f"[✗] Failed to submit Step 4 for {ome}: {job_or_err}")
+                print(f"(!) Failed to submit Step 4 for {ome}: {job_or_err}")
 
     df.to_csv(progress_file, sep="\t", index=False)
     print(f"\nProgress tracker updated: {progress_file}")

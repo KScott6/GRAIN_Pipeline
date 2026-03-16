@@ -24,8 +24,8 @@ for i, row in df.iterrows():
     elif row["step3_job"] != "FAILED" and row[step_col] == "":
         print(f"[ ] Incomplete: {ome} — BUSCO output not found")
 
-print(f"[✓] Updated {updated} genomes in {step_col}.")
+print(f"Updated {updated} genomes in {step_col}.")
 
 # Save updated progress file
 df.to_csv(progress_file, sep="\t", index=False)
-print(f"[✓] Saved: {progress_file}")
+print(f"Saved: {progress_file}")

@@ -99,14 +99,14 @@ def main():
             print(f"[!] Missing genome FASTA: {fna} (skipping)")
             continue
 
-        # We want BUSCO layout:
+        # Needs BUSCO layout:
         # by_ome/<ome>/<ome>/(logs, run_fungi_odb10, short_summary...)
         ome_parent_dir = busco_output_base / ome
         ome_busco_dir = ome_parent_dir / ome  # where BUSCO actually writes outputs
         final_summary = summary_output_dir / f"{ome}.txt"
 
         # Expected summary path(s) inside by_ome/<ome>/<ome>/
-        # We don't hardcode lineage string in case BUSCO varies slightly.
+        # lineage string isn't hardcoded in case BUSCO output varies slightly - I think I problem with some earlier BUSCO versions vs current
         expected_summary_glob = f"short_summary.specific.*.{ome}.txt"
 
         if args.skip_existing:

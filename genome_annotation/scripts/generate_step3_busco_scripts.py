@@ -32,6 +32,7 @@ Include genomes even if step3_done is already set:
 
 Notes / cautions
 ----------------
+- I usually don't run this step. Lots of issues with Augustus, and still very good annotations without.
 - Step 3 is intentionally NOT dependent on Step 2 (repeat masking).
 - The default behavior copies trained AUGUSTUS species models into the
   shared AUGUSTUS config inside the conda environment. This can be risky
@@ -129,8 +130,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--conda_env",
-        default="/project/arsef/environments/funannotate",
-        help="Conda environment path to activate (default: /project/arsef/environments/funannotate).",
+        default="/project/arsef/environments/funannotate_working",
+        help="Conda environment path to activate (default: /project/arsef/environments/funannotate_working).",
     )
 
     return p.parse_args()
@@ -190,7 +191,7 @@ def sbatch_submit(script_path: Path) -> Tuple[bool, str]:
 
 
 def is_ready_for_step3(row: pd.Series) -> bool:
-    # Step 3 depends only on Step 1 completion
+    # Step 3 depends only on step1 completion, NOT step2
     return str(row.get("step1_done", "")).strip() != ""
 
 
@@ -213,10 +214,10 @@ def build_slurm_script(
     out_name = f"{ome}_prelim"
     busco_output_path = busco_output_dir / out_name
 
-    # This matches your previous layout
+    # matches the previous layout
     retrain_path = busco_output_path / f"run_{busco_lineage}" / "augustus_output" / "retraining_parameters" / f"BUSCO_{ome}_prelim"
 
-    # Optional AUGUSTUS copy block
+    # optional AUGUSTUS copy block
     if args.no_augustus_copy:
         augustus_block = f"""
 echo "[i] --no_augustus_copy set: skipping AUGUSTUS species copy for {ome}"
@@ -236,7 +237,7 @@ else
 fi
 """
 
-    return f"""#!/bin/bash
+    return f"""#!/bin/bash -l
 #SBATCH --time={args.time}
 #SBATCH --nodes={args.nodes}
 #SBATCH --ntasks-per-node={args.ntasks_per_node}
@@ -303,7 +304,7 @@ def main() -> None:
         print(f"Progress file: {progress_file}")
         return
 
-    # Validate BUSCO DB exists (fail early)
+    # make sure BUSCO DB exists (fail early if not)
     if not busco_db_path.exists():
         raise FileNotFoundError(f"BUSCO DB path does not exist: {busco_db_path}")
 
@@ -320,14 +321,14 @@ def main() -> None:
         busco_output_dir = genome_dir / "busco"
 
         if not sort_input.exists():
-            print(f"[✗] Missing sorted genome for {ome}, skipping: {sort_input}")
+            print(f"(!) Missing sorted genome for {ome}, skipping: {sort_input}")
             df = update_progress_row(df, ome, {"note": "Missing Step 1 sorted fasta for Step 3"})
             continue
 
         # Optional skip if output already exists
         expected_dir = busco_output_dir / f"{ome}_prelim"
         if (not args.force) and expected_dir.exists():
-            print(f"[✓] Skipping {ome} — BUSCO output already exists: {expected_dir}")
+            print(f"Skipping {ome} : BUSCO output already exists: {expected_dir}")
             continue
 
         slurm_script_path = script_output_dir / f"{ome}_step3_busco.sh"
@@ -354,10 +355,10 @@ def main() -> None:
         ok, job_or_err = sbatch_submit(slurm_script_path)
         if ok:
             df = update_progress_row(df, ome, {"step3_job": job_or_err, "step3_done": "", "note": ""})
-            print(f"[✓] Submitted BUSCO for {ome}: Job {job_or_err}")
+            print(f"Submitted BUSCO for {ome}: Job {job_or_err}")
         else:
             df = update_progress_row(df, ome, {"step3_job": "FAILED", "step3_done": "FAILED", "note": f"step3 submission failed: {job_or_err}"})
-            print(f"[✗] Failed to submit BUSCO for {ome}: {job_or_err}")
+            print(f"Failed to submit BUSCO for {ome}: {job_or_err}")
 
     df.to_csv(progress_file, sep="\t", index=False)
     print(f"\nProgress tracker updated: {progress_file}")

@@ -55,7 +55,7 @@ Notes / assumptions
 - This script updates/creates a progress TSV:
       progress/annotation_master_progress.tsv
 - The "genus" column is preserved but not filled by this step.
-- You can tune SLURM resources via CLI flags (time/cpus/mem/account).
+- You can tune SLURM resources via CLI flags (time/cpus/mem/account/whatever).
 
 """
 
@@ -84,7 +84,7 @@ DEFAULT_PROGRESS_COLUMNS = [
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Generate (and optionally submit) SLURM scripts for funannotate sort (Step 1)."
+        description="Generate (and *optionally* submit) SLURM scripts for funannotate sort (Step 1)."
     )
 
     # Core project structure
@@ -104,7 +104,7 @@ def parse_args() -> argparse.Namespace:
     group.add_argument(
         "--ome_list",
         default=None,
-        help="Path to a text file with one OME code per line (e.g., OME_00001).",
+        help="Path to a text file with one OME code per line (such as a simplified isolate code or accession).",
     )
     group.add_argument(
         "--genome_paths",
@@ -138,8 +138,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--conda_env",
-        default="/project/arsef/environments/funannotate",
-        help="Conda environment path to activate (default: /project/arsef/environments/funannotate).",
+        default="/project/arsef/environments/funannotate_working",
+        help="Conda environment path to activate (default: /project/arsef/environments/funannotate_working).",
     )
     p.add_argument(
         "--minlen",
@@ -154,7 +154,7 @@ def parse_args() -> argparse.Namespace:
 def load_or_init_progress(progress_file: Path) -> pd.DataFrame:
     if progress_file.exists():
         df = pd.read_csv(progress_file, sep="\t", dtype=str).fillna("")
-        # Ensure required columns exist (in case the schema evolved)
+        # make sure tje required columns exist
         for col in DEFAULT_PROGRESS_COLUMNS:
             if col not in df.columns:
                 df[col] = ""
@@ -236,8 +236,8 @@ def build_slurm_script(
     work_prep_dir = project_dir / "needs_annotation" / "working_files" / ome / "prep"
     out_fasta = work_prep_dir / f"{ome}.sort.fasta"
 
-    # Use absolute paths in the SLURM script to reduce ambiguity
-    return f"""#!/bin/bash
+    # Using absolute paths in the SLURM script to reduce ambiguity
+    return f"""#!/bin/bash -l
 #SBATCH --time={time}
 #SBATCH --cpus-per-task={cpus}
 #SBATCH --mem={mem}

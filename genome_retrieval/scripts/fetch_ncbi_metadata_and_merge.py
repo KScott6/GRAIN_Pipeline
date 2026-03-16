@@ -10,7 +10,7 @@ from typing import List, Optional, Set, Tuple
 import pandas as pd
 
 
-# Default fields: matches your prior bash workflow (datasets -> dataformat tsv)
+# Default fields
 DEFAULT_FIELDS = ",".join([
     "current-accession",
     "assminfo-assembly-method",
@@ -84,7 +84,7 @@ def read_taxa_file(path: Path) -> List[str]:
         taxa = text_lines
     else:
         # Otherwise treat as delimited; assume header may or may not exist.
-        # Read twice: once assuming header, once assuming no header, then pick the one with more rows.
+        # read it twice: once assuming header, once assuming no header, then pick the one with more rows.
         df_header = pd.read_csv(path, dtype=str)
         df_noheader = pd.read_csv(path, dtype=str, header=None)
 
@@ -146,7 +146,7 @@ def fetch_one_taxon(taxon: str, fields: str) -> Optional[pd.DataFrame]:
     ]
     rc, out, err = run_cmd(cmd)
     if rc != 0:
-        print(f"[WARN] Taxon fetch failed: {taxon}\n{err}", file=sys.stderr)
+        print(f"[WARNING] Taxon fetch failed: {taxon}\n{err}", file=sys.stderr)
 
     out = out.strip()
     if not out:
@@ -167,7 +167,7 @@ def fetch_one_accession(acc: str, fields: str) -> Optional[pd.DataFrame]:
     ]
     rc, out, err = run_cmd(cmd)
     if rc != 0:
-        print(f"[WARN] Accession fetch failed: {acc}\n{err}", file=sys.stderr)
+        print(f"[WARNING] Accession fetch failed: {acc}\n{err}", file=sys.stderr)
 
     out = out.strip()
     if not out:

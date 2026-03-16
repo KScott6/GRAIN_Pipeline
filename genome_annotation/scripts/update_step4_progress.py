@@ -23,9 +23,9 @@ for i, row in df.iterrows():
             df.at[i, step_col] = mod_time
             updated += 1
     elif row["step4_job"] != "FAILED" and row[step_col] == "":
-        print(f"[ ] Incomplete: {ome} — No GFF3 output found")
+        print(f"(!) Incomplete: {ome} — No GFF3 output found")
 
 # Save updates
-print(f"[✓] Updated {updated} genomes in {step_col}.")
+print(f"Updated {updated} genomes in {step_col}.")
 df.to_csv(progress_file, sep="\t", index=False)
-print(f"[✓] Saved: {progress_file}")
+print(f"Saved: {progress_file}")

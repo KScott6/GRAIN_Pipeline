@@ -247,7 +247,7 @@ def main() -> None:
             with failed_log.open("a") as fh:
                 for a in chunk:
                     fh.write(a + "\n")
-            print(f"[WARN] Chunk {i} extracted but data dir missing; logged failures.")
+            print(f"[WARNING] Chunk {i} extracted but data dir missing; logged failures.")
             # cleanup
             if ncbi_dataset_dir.exists():
                 shutil.rmtree(ncbi_dataset_dir)

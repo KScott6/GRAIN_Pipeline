@@ -23,8 +23,8 @@ for i, row in df.iterrows():
             df.at[i, "step1_done"] = mod_time
             updated += 1
 
-print(f"[✓] Updated step1_done for {updated} genomes.")
+print(f"Updated step1_done for {updated} genomes.")
 
 # Save progress file
 df.to_csv(progress_file, sep="\t", index=False)
-print(f"[✓] Saved updated progress file: {progress_file}")
+print(f"Saved updated progress file: {progress_file}")
