@@ -90,13 +90,13 @@ You can also download multiple portals at once. First, make a single column data
 Example downloading multiple portals from JGI:
 
 ```bash
-cd /project/arsef/mycotools_test/jgi_download
+cd /project/arsef/databases/mycotools/split_predb/3.20.26_jgi
 
-jgiDwnld -i /project/arsef/mycotools_test/jgi_download/jgi_portals_input.txt -a -g
+jgiDwnld -i /project/arsef/databases/mycotools/split_predb/3.20.26_jgi.txt -a -g
 # then enter the mycotools password
 ```
 
-Similarly, this downloads all the data into the fna and gff3 folder, and creates a predb file called: /project/arsef/mycotools_test/jgi_download/jgi_portals_input.txt.predb.tsv
+Similarly, this downloads all the data into the fna and gff3 folder, and creates a predb file called: /project/arsef/databases/mycotools/split_predb/3.20.26_jgi/3.20.26_jgi.txt.predb.tsv
 
 You can compile all your predbs into one large predbs, then move forward with one large file, when first initializing a database. 
 
@@ -118,7 +118,7 @@ mtdb extract --ome -o /project/arsef/projects/hypocreales_tree/standard_dataset_
 
 ## Other useful MycoTools commands
 
-Getting annotation stats for a mtdb. Very quick!
+Getting annotation stats for a mtdb. Very quick! (see [Extra Analyses](https://github.com/KScott6/GRAIN_Pipeline/blob/9d9d2f6e089143af228bbf94304ff3e5586c02ad/extra_analyses) for more info)
 
 ```bash
 annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20250708.mtdb > mtdb_annotation_stats.tsv
@@ -138,7 +138,7 @@ ome2name concatenated.nex.contree > full_name.tree
 
 * You cannot specifiy custom MycoTools ome names when starting a database or adding genomes. 
 
-* MycoTools automatically edits out whitespaces/special characters/etc in the strain names, as wella as complex species names.
+* MycoTools automatically edits out whitespaces/special characters/etc in the strain names, as well as complex species names.
 
 * I was having problems because I had changed my JGI login info. I couldn't change the actual contents of my passwords manager with mtdb manage, so I deleted the .mycotools folder in my home folder. This allowed me to re-run the "mtdb manage -p" command and re-set my NCBI and JGI info, as well as make a new mycotools password.
 

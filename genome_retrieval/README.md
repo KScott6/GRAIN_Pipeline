@@ -52,10 +52,11 @@ module load miniconda
 source activate /project/arsef/environments/ncbi_datasets
 
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
-  --taxa_file /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/desired_taxa.txt \
-  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.08.25.csv \
-  --outdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_taxa_py \
+  --taxa_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/desired_taxa.txt \
+  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.csv \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py \
   --prefix new_genomes \
+  --keep_raw_organism_name \
   --write_all_fetched
 ```
 
@@ -95,37 +96,11 @@ Either option will result in several output files:
 Take a look at the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file. If you don't want to progress with any specific accession, you can simply delete that row from this file, save the file, and progress in this pipeline.
 
 
-### dealing with accessions that already have annotations
-
-(Note: if your accessions already have associated annotations, nothing is stopping you from directly downloading them to the MycoTools database via MycoTools itself. If you do the downloading via Mycotools, you still need to download the extra metadata for the metadata catalog.)
-
-If some of your accessions already have annotations - great! You don't have to worry about annotating them yourself, if you don't want. You can move these already-annotated accessions into their own folder, so they don't get in the way. 
-
-```bash
-python /project/arsef/scripts/move_annotated_genome.py \
-  --src /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py/ncbi_downloads \
-  --dest /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/already_annotated
-```
-
-The --src folder needs to have a /fna and /gff subfolder; if an accession has both a .fna and a .gff, it will be moved into the folder you specified with --dest.
-
-Then, you can make a predb file for the annotated accessions like this:
-
-```bash
-python /project/arsef/scripts/make_predb_from_downloads.py \
-  --fna_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/already_annotated/fna \
-  --gff_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/already_annotated/gff \
-  --metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py_OLD/new_genomes.taxa.NEW_ONLY.tsv \
-  --out /project/arsef/databases/mycotools/split_predb/3.2.26.predb.tsv
-```
-
-Then contact the MycoTools database admin (Kelsey) so she can incorporate your new accessions into the database. 
-
 <br>
 
 ## Step 2 - download the genome assemblies (optionally, their annotations as well)
 
-Now you can provide the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file to the download_ncbi_batches.py script. This script will download these new accessions will automatically. You will probably want to run this step as a job if you are downloading a large number of accessions.
+Now you can provide the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file (or any file where the first column is a list of accessions) to the download_ncbi_batches.py script. This script will download these new accessions will automatically. You will probably want to run this step as a job if you are downloading a large number of accessions.
 
 Note that the --with_annotation flag controls whether annotation files are requested. All genome assemblies are downloaded regardless.
 
@@ -137,10 +112,10 @@ Here is an example command where I provide the NEW_ONLY.tsv output from my first
 source activate /project/arsef/environments/ncbi_datasets # activate ncbi_datasets environment if it's not already activated
 
 python /project/arsef/scripts/download_ncbi_batches.py \
-  --metadata /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
-  --outdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads \
+  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/selected_accessions.txt \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads \
   --with_annotation \
-  --api_key "ABC12345667789" # include your API key
+  --api_key "d6926b64c92bae955bd32d96fe4fa7386408" # include your API key
 ```
 
 Options:
@@ -170,11 +145,38 @@ You probably want to annotate your assemblies now - check out the [SCINet Funann
 
 <br>
 
+### dealing with accessions that already have annotations
+
+(Note: if your accessions already have associated annotations, nothing is stopping you from directly downloading them to the MycoTools database via MycoTools itself. If you do the downloading via Mycotools, you still need to download the extra metadata for the metadata catalog. I prefer to download the genomes with the GRAIN pipeline, so the full metadata is already integrated into the metadata catalog.)
+
+If some of your accessions already have annotations - great! You don't have to worry about annotating them yourself, if you don't want. You can move these already-annotated accessions into their own folder, so they don't get in the way. 
+
+```bash
+python /project/arsef/scripts/move_annotated_genome.py \
+  --src /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads \
+  --dest /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated
+```
+
+The --src folder needs to have a /fna and /gff subfolder; if an accession has both a .fna and a .gff, it will be moved into the folder you specified with --dest.
+
+Then, you can make a predb file for the annotated accessions like this:
+
+```bash
+python /project/arsef/scripts/make_predb_from_downloads.py \
+  --fna_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated/fna \
+  --gff_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated/gff \
+  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  --out /project/arsef/databases/mycotools/split_predb/3.20.26.predb.tsv
+```
+
+Then contact the MycoTools database admin (Kelsey) so she can incorporate your new accessions into the database. 
+
+
 Notes:
 
 If you are downloading many accessions, you should probably submit this as a job. If you run into any issues with this step, there are many helpful log files that are generated in your specified output folder. 
 
-Although there were no explicitly stated NCBI genome download limits, I started to get intermittent download denials around my 1000th accession and I got completely cut off around my 25000th accession. Between the cutoffs and the occasional normal download failures, it took three attempts to download all the genomes from my list of 5438 accessions.
+Although there were no explicitly stated NCBI genome download limits, I started to get intermittent download denials around my 1000th accession and I got completely cut off around my 2500th accession. Between the cutoffs and the occasional normal download failures, it took three attempts to download all the genomes from my list of 5438 accessions.
 
 Of the 5438 genomes I downloaded, only 1447 had associated annotation files (~26%). All data downloaded for these accessions (faa, gff, fna, etc) was only 327GB.
 
