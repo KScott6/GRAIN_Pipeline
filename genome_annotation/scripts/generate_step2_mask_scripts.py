@@ -126,8 +126,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--conda_env",
-        default="/project/arsef/environments/funannotate_working",
-        help="Conda environment path to activate (default: /project/arsef/environments/funannotate_working).",
+        default="/project/arsef/environments/funannotate",
+        help="Conda environment path to activate (default: /project/arsef/environments/funannotate).",
     )
     p.add_argument(
         "--blast_usage_report",
