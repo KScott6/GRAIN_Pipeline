@@ -8,15 +8,51 @@ When you submit genomic information into the MycoTools database, the database it
 
 Here are the basic analyses that still need to be run so that you can fully populate the metadata catalog with the proper information. This includes:
 
-1) QUAST (genome assembly statistics)
+1) BUSCO (to assess genome completeness, as well as use the identified BUSCOs in cano.py)
 
-2) annotationStats (genome annotation statistics)
+2) QUAST (genome assembly statistics)
 
-3) BUSCO (to assess genome completeness, as well as use the identified BUSCOs in cano.py)
+3) annotationStats (genome annotation statistics)
 
 The metadata for each NCBI accession should also be uploaded to this database. 
 
 This walkthrough will show you how to run all of these analyses automatically, then integrate this metadata into the metadata catalog. 
+
+<br>
+
+---
+
+## BUSCO (fungi)
+
+I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that automatically takes either 
+
+1) the mtdb produced when you run predb2mtdb, or
+
+2) a file containing a list of ome codes, or 
+
+3) literally any tsv/csv whose first column is a list of ome codes (no header). 
+
+This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The fungi_odb10 is the hard-coded default because cano.py depends on these BUSCO results all using the same BUSCO database. Do not attempt to change the BUSCO dataset in this command. If you need to run a different BUSCO dataset on your genomes, you need to generate your own BUSCO commands.
+
+```bash
+module load miniconda
+
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260323_new/ome_list.txt --submit --skip-existing
+```
+
+Leave off the "--submit" if you want to preview the created BUSCO job scripts without running them. 
+
+If "--skip-existing" is specified, the script will skip any ome that already has a short summary file in :short_summary in /project/arsef/databases/mycotools/database_stats/busco/fungi/by_ome/<ome>/<ome>/
+
+This script will log any ome that did not successfully complete the BUSCO analyses, so that you can re-run them with more time/RAM. 
+
+After all the BUSCO jobs have completed, now you need to parse the BUSCO txt output with the BUSCO parsing script:
+
+```bash
+python /project/arsef/databases/mycotools/scripts/parse_busco_summaries.py
+```
+
+This will automatically parse the folder with all the collected BUSCO results (/project/arsef/databases/mycotools/database_stats/busco/fungi/short_summaries) and compile all the info for every ome into a single file. If you don't see your ome in that file, it means either the BUSCO run was unsucessful, or the final summary file was not copied over (known issue for some omes, not sure why).
 
 <br>
 
@@ -34,17 +70,19 @@ The generate_quast_jobs.py script will generate and submit individual QUAST anal
 
 3) a command telling QUAST to run on all genomes in the MycoTools catalog that do not have QUAST results yet (--all_missing_quast).
 
+(!) note: Right now, this command depends on the ome already being in the catalog in order for the job to be submitted. I need to fix this. 
+
 ```bash
 python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
-    --ome_list omes.txt \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.09.26.csv \
+    --ome_list /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260323_new/ome_list.txt \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.csv \
     --output_base /project/arsef/databases/mycotools/database_stats/quast \
     --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
     --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
 
 python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
     --all_missing_quast \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.09.26.csv \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.csv \
     --output_base /project/arsef/databases/mycotools/database_stats/quast \
     --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
     --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
@@ -91,41 +129,6 @@ annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260307.mtd
 
 ---
 
-## BUSCO (fungi)
-
-I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that automatically takes either 
-
-1) the mtdb produced when you run predb2mtdb, or
-
-2) a file containing a list of ome codes, or 
-
-3) literally any tsv/csv whose first column is a list of ome codes (no header). 
-
-This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The fungi_odb10 is the hard-coded default because cano.py depends on these BUSCO results all using the same BUSCO database. Do not attempt to change the BUSCO dataset in this command. If you need to run a different BUSCO dataset on your genomes, you need to generate your own BUSCO commands.
-
-```bash
-module load miniconda
-
-python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/problem_busco_omes.txt --submit --skip-existing
-```
-
-Leave off the "--submit" if you want to preview the created BUSCO job scripts without running them. 
-
-If "--skip-existing" is specified, the script will skip any ome that already has a short summary file in :short_summary in /project/arsef/databases/mycotools/database_stats/busco/fungi/by_ome/<ome>/<ome>/
-
-This script will log any ome that did not successfully complete the BUSCO analyses, so that you can re-run them with more time/RAM. 
-
-After all the BUSCO jobs have completed, now you need to parse the BUSCO txt output with the BUSCO parsing script:
-
-```bash
-python /project/arsef/databases/mycotools/scripts/parse_busco_summaries.py
-```
-
-This will automatically parse the folder with all the collected BUSCO results (/project/arsef/databases/mycotools/database_stats/busco/fungi/short_summaries) and compile all the info for every ome into a single file. If you don't see your ome in that file, it means either the BUSCO run was unsucessful, or the final summary file was not copied over (known issue for some omes, not sure why).
-
-<br>
-
----
 
 ## Integrating metadata into metadata catalog
 

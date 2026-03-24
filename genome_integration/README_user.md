@@ -10,9 +10,20 @@ My documentation for setting up and maintaining the SCINet/ARSEF MycoTools datab
 
 ### Step 1 : make the predb
 
-A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one using the commands from MycoTools yourself, make one yourself (follow [example predb file](genome_integration/examples/example.predb)), or just use the output predb provided by the GRAIN retrieval or annotation steps. 
+A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one by using the commands from MycoTools yourself, make one yourself manually (follow [example predb file](genome_integration/examples/example.predb)), or just use the output predb provided by the GRAIN scripts. 
 
 **Important note:** You will need to specify where each new assembly/annotation came from; either from "ncbi", "jgi", or "new" from your own lab. I have put down all the NCBI assemblies with OUR annotations as "new" and you should do the same.  
+
+For genomes that have just finished being annotated in the standard GRAIN pipeline, you can automatically create a predb for them like this:
+
+```bash
+python /project/arsef/scripts/make_predb_from_pipeline_results.py \
+  -o /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.20.26/ome_list.txt \
+  -m /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  --ome-column assembly_acc \
+  -out /project/arsef/databases/mycotools/split_predb/3.23.26.predb \
+  --warnings-file /project/arsef/databases/mycotools/split_predb/newly_annotated_genomes.warnings.tsv
+```
 
 <br>
 
