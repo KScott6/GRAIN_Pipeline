@@ -98,6 +98,8 @@ Take a look at the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file. If you don't wa
 
 <br>
 
+---
+
 ## Step 2 - download the genome assemblies (optionally, their annotations as well)
 
 Now you can provide the <prefix>.<accessions/taxa>.NEW_ONLY.tsv file (or any file where the first column is a list of accessions) to the download_ncbi_batches.py script. This script will download these new accessions will automatically. You will probably want to run this step as a job if you are downloading a large number of accessions.
@@ -147,6 +149,8 @@ For those genomes that do NOT have annotation files, you need to prepare them fo
 
 <br>
 
+---
+
 ## Step 3a: dealing with accessions which already have annotations
 
 (Note: if your accessions already have associated annotations, nothing is stopping you from directly downloading them to the MycoTools database via MycoTools itself. If you do the downloading via Mycotools, you still need to download the extra metadata for the metadata catalog. I prefer to download the genomes with the GRAIN pipeline, so the full metadata is already integrated into the metadata catalog.)
@@ -173,11 +177,46 @@ python /project/arsef/scripts/make_predb_from_downloads.py \
 
 Then contact the MycoTools database admin (Kelsey) so she can incorporate your new accessions into the database. 
 
+<br>
 
 ## Step 3b: Preparing for genome annotation (for genomes that didn't come with annotations)
 
-Notes:
+You can automatically fill in the ome code (accession) and genus information for these genomes like this:
+You need to have moved the gneomes that already have annotations out of the assembly folder before running this (move_annotated_genome.py in step 3b). 
 
+```bash
+python /project/arsef/scripts/prepare_annotation_progress.py \
+
+-p /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv \
+-a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/fna \
+--ome-col assembly_acc \
+--genus-col genus
+
+python /project/arsef/scripts/prepare_annotation_progress.py \
+    -i /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+    -p /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv \
+    -a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/fna \
+    --ome-col assembly_acc \
+    --organism-col "Assembly BioSample Description Organism Name"
+```
+
+`-i`/`--input` path to the metadata sheet created during the genome accession download step (step1)
+
+`-p`/`--progress` path to the progress file (should never change)
+
+`-a`/`--assembly-dir` path to the folder containing the assemblies
+
+`--ome-col` in your metadata sheet, specify the column name that contains the ome code you want
+
+`--organism-col` in your metadata sheet, specify the column name (in quotes) that contains the organism name
+
+`--genus-col` in your metadata sheet, specify the column name that contains the genus names (if this exists)
+
+`--sort` 
+
+`--extensions` if you have "weird" files extensions (other than .fa,.fasta,.fna,.fa.gz,.fasta.gz,.fna.gz), specify them here (like .contigs.fasta)
+
+`--recursive` include this if you want to search revursively in the provided genome folder
 
 <br>
 
