@@ -37,12 +37,22 @@ This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The
 ```bash
 module load miniconda
 
-python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260325/CR_new_omes.txt --submit --skip-existing
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260330/predb2mtdb.mtdb --submit --skip-existing --threads 36
 ```
 
-Leave off the "--submit" if you want to preview the created BUSCO job scripts without running them. 
+`--submit` If specified, will automatically submit the generated scripts
 
-If "--skip-existing" is specified, the script will skip any ome that already has a short summary file in :short_summary in /project/arsef/databases/mycotools/database_stats/busco/fungi/by_ome/<ome>/<ome>/
+`--skip-existing` If specified, the script will skip any ome that already has a short summary file in :short_summary in /project/arsef/databases/mycotools/database_stats/busco/fungi/by_ome/<ome>/<ome>/
+
+`--metaeuk` If specified, will use the Metaeuk gene predictor software rather than the default Miniprot. **only use this is you REALLY need BUSCO results for particular genomes**. I would prefer to keep the database with as much default parameters as possible. 
+
+`--threads` Specify how many threads for slurm options
+
+`--mem-per-cpu` Specify how much mem per cpu for slurm options (example --mem-per-cpu 16G)
+
+`--time` Specify job time limit for slurm options
+
+This script checks the currently running jobs and will not submit a BUSCO job for an ome if there is already one running for that particular ome. 
 
 This script will log any ome that did not successfully complete the BUSCO analyses, so that you can re-run them with more time/RAM. 
 
@@ -74,15 +84,15 @@ The generate_quast_jobs.py script will generate and submit individual QUAST anal
 
 ```bash
 python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
-    --ome_list /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260323_new/ome_list.txt \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.24.26.csv \
-    --output_base /project/arsef/databases/mycotools/database_stats/quast \
+    --ome_list /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260330.mtdb \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
     --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
-    --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
+    --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs \
+    --output_base /project/arsef/databases/mycotools/database_stats/quast 
 
 python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
     --all_missing_quast \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.24.26.csv \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
     --output_base /project/arsef/databases/mycotools/database_stats/quast \
     --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
     --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
@@ -121,7 +131,7 @@ This may take a few minutes on the login node (~5 minutes), especially if you're
 ```bash
 source activate /project/arsef/environments/mycotools/
 
-annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260323.mtdb > /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.24.26.tsv
+annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260330.mtdb > /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.30.26.tsv
 
 ```
 
@@ -149,20 +159,6 @@ python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --entrez_api_key YOUR_NCBI_API_KEY \
   --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.taxonomy.csv
 
-python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
-  --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.11.26.csv \
-  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260323.mtdb \
-  --busco /project/arsef/databases/mycotools/database_stats/busco/fungi/busco_summary_table.csv \
-  --ncbi_metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
-  --annotation_stats /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.24.26.tsv \
-  --add_taxonomy \
-  --entrez_email scott.1907@osu.edu\
-  --entrez_api_key YOUR_NCBI_API_KEY \
-  --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.24.26.csv
-
-python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
-  --metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.24.26.csv \
-  --quast /project/arsef/databases/mycotools/database_stats/quast/quast_summary_combined.tsv
 
 ```
 
