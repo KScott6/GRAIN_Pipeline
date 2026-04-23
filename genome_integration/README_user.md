@@ -18,10 +18,10 @@ For genomes that have just finished being annotated in the standard GRAIN pipeli
 
 ```bash
 python /project/arsef/scripts/make_predb_from_pipeline_results.py \
-  -o /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.20.26/ome_list.txt \
-  -m /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+  -o /project/arsef/databases/mycotools/split_predb/add_genomes_3.27.26.txt \
+  -m /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py_OLD/new_genomes.taxa.NEW_ONLY.tsv \
   --ome-column assembly_acc \
-  -out /project/arsef/databases/mycotools/split_predb/3.23.26.predb \
+  -out /project/arsef/databases/mycotools/split_predb/3.27.26_new2.predb \
   --warnings-file /project/arsef/databases/mycotools/split_predb/newly_annotated_genomes.warnings.tsv
 ```
 
@@ -105,6 +105,15 @@ cd /project/arsef/databases/mycotools/split_predb/3.20.26_jgi
 
 jgiDwnld -i /project/arsef/databases/mycotools/split_predb/3.20.26_jgi.txt -a -g
 # then enter the mycotools password
+
+# this will create a predb with some wonky formatting
+# rename the first column to #assembly_acc, get rid of doubled / (possible also need to save as plain text rather than tsv) - I need to figure out exactly what's going on here
+
+# then, make a mtdb from the predb
+mtdb predb2mtdb [path to predb]
+
+#then, add the new mtdb to the complete mycotools database
+mtdb update -a [path to new mtdb]
 ```
 
 Similarly, this downloads all the data into the fna and gff3 folder, and creates a predb file called: /project/arsef/databases/mycotools/split_predb/3.20.26_jgi/3.20.26_jgi.txt.predb.tsv
