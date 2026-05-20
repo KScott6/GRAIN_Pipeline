@@ -50,9 +50,9 @@ This file should already exist (/project/arsef/projects/bulk_genome_annotation/p
 
 This file is central to the pipeline - it tracks where each genome is in the pipeline and each script uses it as a reference when determing which genomes are ready for the next step. SCINet job IDs are stored in this progress tracker, as well as the time/dates when each step was verified as being successfully completed.
 
-**(!)** Each incoming genome should be assigned a unique "ome code" (OMEcode). It will be used to label each genome's intermediate and final output files generated from this pipeline.
+**(!)** Each incoming genome should be assigned a unique code (or "ome code"). It will be used to label each genome's intermediate and final output files generated from this pipeline.
 
-If you obtained your genomes from the GRAIN genome retrieval step (NCBI), this ome code is already assigend (the NCBI accession). 
+If you obtained your genomes from the GRAIN genome retrieval step (NCBI), this ome code is already assigned (the NCBI accession). 
 
 If you are annotating a genome from another source, you need to assing your own ome code to your incoming genome. This ome code should be a short and SIMPLE (no spaces or special characters besides . or _) prefix.  I recommend using the simplified isolate name as each genome's ome code. Don't worry too much about the ome code - this name is important but temporary. When your final assemblies and annotations are uploaded to the MycoTools database, it will be assigned a permanent code. 
 
@@ -113,8 +113,8 @@ Here is an example:
 module load miniconda
 
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step1_sort_scripts.py \
---fna_input_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/fna \
---ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.20.26/ome_list.txt
+--fna_input_dir /project/arsef/projects/bulk_genome_annotation/needs_annotation/april_pacbio_genomes \
+--ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/april_pacbio_genomes/april_pacbio_genomes.txt
 
 ```
 
@@ -174,7 +174,7 @@ The important files generated from this step are copied safely into: needs_annot
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step2_mask_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.20.26/ome_list.txt
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/april_pacbio_genomes/april_pacbio_genomes.txt
 ```
 
 Useful options (although you'll probably never change the defaults):
@@ -241,8 +241,8 @@ Step 4 uses an intermediate output folder on /90daydata (scratch storage) and th
 
 ```bash
 python /project/arsef/projects/bulk_genome_annotation/commands/generate_step4_funannotate_scripts.py \
-  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.20.26/round3.txt \
-  --submit --resume
+  --ome_list /project/arsef/projects/bulk_genome_annotation/needs_annotation/april_pacbio_genomes/april_pacbio_genomes.txt \
+  --submit
 ```
 
 This script will automatically NOT submit jobs for omes that already have a gff3 found, UNLESS you include the --overwrite flag. 
@@ -251,7 +251,9 @@ This script will automatically NOT submit jobs for omes that already have a gff3
 
 `--submit` Include this flag to subimt created job scripts.
 
-`--overwrite` Include this flag to force re-run this step for all specified omes. 
+`--force` Include the funannotate parameter "--force" in all created job scripts, which means Funannotate will run even if your genome has warnings (like "bad" contigs, contigs alphabet <4, etc.)
+
+`--overwrite` Include this flag to re-run this step for all specified omes in the provided ome list. 
 
 Once the annotation jobs are complete, you can update the progress sheet with this command:
 

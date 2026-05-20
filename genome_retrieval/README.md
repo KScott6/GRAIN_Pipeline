@@ -39,8 +39,8 @@ If you provide the path to the lab's genome metadata catalog (make sure you're u
 
 I like to organize all the genome retrieval output in the ./bulk_genome_annotation/genome_retrieval folder, separated by data of retrieval.
 ```bash
-mkdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.12.26
-cd /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.12.26
+mkdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26
+cd /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26
 ```
 
 Use the fetch_ncbi_metadata_and_merge.py to take incoming search parameters (taxa names or accessions) and prepare for the download. You can give a custom prefix to your output files with --prefix.
@@ -64,9 +64,9 @@ Or you can provide a csv or txt file that is a single-column list of NCBI access
 
 ```bash
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
-  --accessions_file /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/desired_accessions.txt \
-  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.08.25.csv \
-  --outdir /project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_metadata_by_acc \
+  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26/5.12.26_accessions.txt \
+  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26/ncbi_metadata_by_acc \
   --prefix new_genomes \
   --keep_raw_organism_name \
   --write_all_fetched
@@ -108,7 +108,7 @@ Note that the --with_annotation flag controls whether annotation files are reque
 
 You will also need to provide a path to the output folder you want to create and download to - this output folder is created automatically.
 
-Here is an example command where I provide the NEW_ONLY.tsv output from my first command, and point the output to a folder I want to make in the bulk genome annotation folder. Make sure to provide your NCBI API key. 
+Here is an example command where I provide the NEW_ONLY.tsv (metadata) output from my first command, and point the output to a folder I want to make in the bulk genome annotation folder. Make sure to provide your NCBI API key. 
 
 ```bash
 source activate /project/arsef/environments/ncbi_datasets # activate ncbi_datasets environment if it's not already activated
