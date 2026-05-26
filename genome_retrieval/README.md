@@ -64,24 +64,13 @@ Or you can provide a csv or txt file that is a single-column list of NCBI access
 
 ```bash
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
-  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26/5.12.26_accessions.txt \
-  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
-  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26/ncbi_metadata_by_acc \
+  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.18.26/5.18.26_accessions.txt \
+  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_05.17.26.csv \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.18.26/ncbi_metadata_by_acc \
   --prefix new_genomes \
   --keep_raw_organism_name \
   --write_all_fetched
 ```
-
-
-```bash
-python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
-  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/metadata_update/accession_list.txt \
-  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/metadata_update \
-  --prefix metadata_update \
-  --keep_raw_organism_name \
-  --write_all_fetched
-```
-
 
 `--keep_raw_organism_name` keeps the raw "organism" name reported by NCBI. Recommended to use this flag, for recordkeeping purposes. 
 
