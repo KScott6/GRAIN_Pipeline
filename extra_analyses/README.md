@@ -37,7 +37,7 @@ This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The
 ```bash
 module load miniconda
 
-python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260330/predb2mtdb.mtdb --submit --skip-existing --threads 36
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260701/predb2mtdb.mtdb --submit --skip-existing --threads 36
 ```
 
 `--submit` If specified, will automatically submit the generated scripts
@@ -131,7 +131,7 @@ This may take a few minutes on the login node (~5 minutes), especially if you're
 ```bash
 source activate /project/arsef/environments/mycotools/
 
-annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260330.mtdb > /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_03.30.26.tsv
+annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260701.mtdb > /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_07.1.26.tsv
 
 ```
 

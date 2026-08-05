@@ -37,7 +37,7 @@ With the fetch_ncbi_metadata_and_merge.py script, you will provide either a list
 
 If you provide the path to the lab's genome metadata catalog (make sure you're using the most recent version!), the script will automatically deduplicate any incoming genome data. If you do NOT provide a link to a metadata sheet, the script will fetch metadata for any genome matching your desired taxa/accessions, without performing deduplication.
 
-I like to organize all the genome retrieval output in the ./bulk_genome_annotation/genome_retrieval folder, separated by data of retrieval.
+I like to organize all the genome retrieval output in the ./bulk_genome_annotation/genome_retrieval folder, separated by date of retrieval.
 ```bash
 mkdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26
 cd /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26

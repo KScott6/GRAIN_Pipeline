@@ -17,11 +17,14 @@ A predb is a tsv file with the accession information, assembly and annotations p
 For genomes that have just finished being annotated in the standard GRAIN pipeline, you can automatically create a predb for them like this:
 
 ```bash
+
+NOTE: YOU NEED TO EDIT THIS - make sure it pulls genome assemblies from the funannotate folder!
+
 python /project/arsef/scripts/make_predb_from_pipeline_results.py \
-  -o /project/arsef/databases/mycotools/split_predb/add_genomes_3.27.26.txt \
-  -m /project/arsef/projects/bulk_genome_annotation/needs_annotation/3.2.26/ncbi_metadata_by_taxa_py_OLD/new_genomes.taxa.NEW_ONLY.tsv \
+  -o /project/arsef/projects/bulk_genome_annotation/needs_annotation/6.30.26/6.30.26_fusariums.txt \
+  -m /project/arsef/projects/bulk_genome_annotation/genome_retrieval/6.30.26/ncbi_metadata_by_acc/new_genomes.accessions.NEW_ONLY.tsv \
   --ome-column assembly_acc \
-  -out /project/arsef/databases/mycotools/split_predb/3.27.26_new2.predb \
+  -out /project/arsef/databases/mycotools/split_predb/7.1.26.predb \
   --warnings-file /project/arsef/databases/mycotools/split_predb/newly_annotated_genomes.warnings.tsv
 ```
 
