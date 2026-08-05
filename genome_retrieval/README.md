@@ -38,6 +38,7 @@ With the fetch_ncbi_metadata_and_merge.py script, you will provide either a list
 If you provide the path to the lab's genome metadata catalog (make sure you're using the most recent version!), the script will automatically deduplicate any incoming genome data. If you do NOT provide a link to a metadata sheet, the script will fetch metadata for any genome matching your desired taxa/accessions, without performing deduplication.
 
 I like to organize all the genome retrieval output in the ./bulk_genome_annotation/genome_retrieval folder, separated by date of retrieval.
+
 ```bash
 mkdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26
 cd /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.12.26
@@ -64,9 +65,9 @@ Or you can provide a csv or txt file that is a single-column list of NCBI access
 
 ```bash
 python /project/arsef/scripts/fetch_ncbi_metadata_and_merge.py \
-  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.18.26/5.18.26_accessions.txt \
-  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_05.17.26.csv \
-  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/5.18.26/ncbi_metadata_by_acc \
+  --accessions_file /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/7.1.26_accessions.txt \
+  --master_metadata /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_07.1.26.csv \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_metadata_by_acc \
   --prefix new_genomes \
   --keep_raw_organism_name \
   --write_all_fetched
@@ -103,8 +104,8 @@ Here is an example command where I provide the NEW_ONLY.tsv (metadata) output fr
 source activate /project/arsef/environments/ncbi_datasets # activate ncbi_datasets environment if it's not already activated
 
 python /project/arsef/scripts/download_ncbi_batches.py \
-  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/selected_accessions.txt \
-  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads \
+  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_metadata_by_acc/new_genomes.accessions.NEW_ONLY.tsv \
+  --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_downloads \
   --with_annotation \
   --api_key "d6926b64c92bae955bd32d96fe4fa7386408" # include your API key
 ```
@@ -148,8 +149,8 @@ If some of your accessions already have annotations - great! You don't have to w
 
 ```bash
 python /project/arsef/scripts/move_annotated_genome.py \
-  --src /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads \
-  --dest /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated
+  --src /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_downloads \
+  --dest /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/already_annotated
 ```
 
 The --src folder needs to have a /fna and /gff subfolder; if an accession has both a .fna and a .gff, it will be moved into the folder you specified with --dest.
@@ -158,10 +159,10 @@ Then, you can make a predb file for the annotated accessions like this:
 
 ```bash
 python /project/arsef/scripts/make_predb_from_downloads.py \
-  --fna_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated/fna \
-  --gff_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/already_annotated/gff \
-  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
-  --out /project/arsef/databases/mycotools/split_predb/3.20.26.predb.tsv
+  --fna_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/already_annotated/fna \
+  --gff_dir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/already_annotated/gff \
+  --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_metadata_by_acc/new_genomes.accessions.NEW_ONLY.tsv \
+  --out /project/arsef/databases/mycotools/split_predb/7.1.26.fusarium.predb.tsv
 ```
 
 Then contact the MycoTools database admin (Kelsey) so she can incorporate your new accessions into the database. 
@@ -175,16 +176,15 @@ You need to have moved the gneomes that already have annotations out of the asse
 
 ```bash
 python /project/arsef/scripts/prepare_annotation_progress.py \
-
 -p /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv \
--a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/fna \
+-a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/6.30.26/ncbi_downloads/fna \
 --ome-col assembly_acc \
 --genus-col genus
 
 python /project/arsef/scripts/prepare_annotation_progress.py \
-    -i /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_metadata_by_taxa_py/new_genomes.taxa.NEW_ONLY.tsv \
+    -i /project/arsef/projects/bulk_genome_annotation/genome_retrieval/6.30.26/ncbi_metadata_by_acc/new_genomes.accessions.NEW_ONLY.tsv \
     -p /project/arsef/projects/bulk_genome_annotation/progress/annotation_master_progress.tsv \
-    -a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/3.20.26/ncbi_downloads/fna \
+    -a /project/arsef/projects/bulk_genome_annotation/genome_retrieval/6.30.26/ncbi_downloads/fna \
     --ome-col assembly_acc \
     --organism-col "Assembly BioSample Description Organism Name"
 ```
