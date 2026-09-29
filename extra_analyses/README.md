@@ -92,7 +92,7 @@ python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
 
 python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
     --all_missing_quast \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
+    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_08.18.26.csv \
     --output_base /project/arsef/databases/mycotools/database_stats/quast \
     --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
     --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
@@ -158,8 +158,6 @@ python /project/arsef/databases/mycotools/scripts/submit_metadata.py \
   --entrez_email your_email@institution.edu \
   --entrez_api_key YOUR_NCBI_API_KEY \
   --out /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.06.26.taxonomy.csv
-
-
 ```
 
 Options:
