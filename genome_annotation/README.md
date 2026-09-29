@@ -64,7 +64,7 @@ In the master progress tracker, there is a column to record the genus of each ge
 
 1) Input genomes needs to be in one folder. 
 
-If you are running this pipeline immediately after the [NCBI genome retrieval pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/1bd0fdd5e2fdbb0980dbbe9ce06f1c692c65b500/genome_retrieval/README.md), you can simply provide the fna folder path. For example:
+If you are running this pipeline immediately after the [NCBI genome retrieval pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_retrieval/README.md), you can simply provide the fna folder path. For example:
 
 `/project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna`
 
@@ -289,3 +289,6 @@ python /project/arsef/scripts/make_predb_from_annotated_genomes.py \
 
 If there is any missing information for any accession (fna, gff, genus, species, strain, etc), that accession will be skipped and not included in the predb.
 
+<br>
+
+Now that you have finished predicting genes for your genome assemblies and created the MycoTools predb file, you can move into the [Genome Integration](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_integration/README_user.md) step of the GRAIN pipeline. 
