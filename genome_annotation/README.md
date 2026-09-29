@@ -64,7 +64,7 @@ In the master progress tracker, there is a column to record the genus of each ge
 
 1) Input genomes needs to be in one folder. 
 
-If you are running this pipeline immediately after the [NCBI genome retrieval pipeline](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_retrieval/README.md), you can simply provide the fna folder path. For example:
+If you are running this pipeline immediately after the [GRAIN Genome Retrieval step](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_retrieval/README.md), you can simply provide the full path to the folder that contains the downloaded fna files. For example:
 
 `/project/arsef/projects/bulk_genome_annotation/needs_annotation/1.14.26/ncbi_downloads/fna`
 
