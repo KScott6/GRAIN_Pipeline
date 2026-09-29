@@ -1,6 +1,6 @@
 # Setting up MycoTools (SCINet / ARSEF)
 
-This is my documentation for setting up our MycoTools database, specific to SCINet/ARSEF. If you are a member of ARSEF project and want to use the lab's shared database, you should not follow this walkthrough. Read the [SCINet/ARSEF MycoTools user walkthrough](https://github.com/KScott6/GRAIN_Pipeline/blob/a51cc1b9470d76adadf37f83b2d9cc6fcba7c437/genome_integration/README_user.md) instead.
+This is my documentation for setting up our MycoTools database, specific to SCINet/ARSEF. If you are a member of ARSEF project and want to use the lab's shared database, you should not follow this walkthrough. Read the [SCINet/ARSEF MycoTools user walkthrough](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_integration/README_user.md) instead.
 
 To learn the basics of MycoTools, it's best to use the official [MycoTools tutorials](https://github.com/xonq/mycotools).
 

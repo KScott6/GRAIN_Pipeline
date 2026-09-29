@@ -2,7 +2,7 @@
 
 This walkthrough describes how to integrate genome assemblies and annotations into our lab's shared MycoTools database. This walkthrough is designed for SCINet users in the arsef project. If you are not SCINet/arsef, you are much better off learning to use MycoTools from the official [MycoTools tutorials](https://github.com/xonq/mycotools).
 
-My documentation for setting up and maintaining the SCINet/ARSEF MycoTools database can be found [here](https://github.com/KScott6/GRAIN_Pipeline/blob/a51cc1b9470d76adadf37f83b2d9cc6fcba7c437/genome_integration/README_admin.md).
+My documentation for setting up and maintaining the SCINet/ARSEF MycoTools database can be found [here](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_integration/README_admin.md).
 
 ---
 
@@ -10,7 +10,7 @@ My documentation for setting up and maintaining the SCINet/ARSEF MycoTools datab
 
 ### Step 1 : make the predb
 
-A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one by using the commands from MycoTools yourself, make one yourself manually (follow [example predb file](genome_integration/examples/example.predb)), or just use the output predb provided by the GRAIN scripts. 
+A predb is a tsv file with the accession information, assembly and annotations paths, species information, source, and restricted-use information for each sample. You can make one by using the commands from MycoTools yourself, make one yourself manually (follow [example predb file](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_integration/examples/example.predb)), or just use the output predb provided by the GRAIN scripts. 
 
 **Important note:** You will need to specify where each new assembly/annotation came from; either from "ncbi", "jgi", or "new" from your own lab. I have put down all the NCBI assemblies with OUR annotations as "new" and you should do the same.  
 
@@ -65,7 +65,7 @@ You will see the metadata in the mtdb (/mtdb/) has been updated, and the new ass
 
 However, you still need to add your genome metadata to the MycoTools metadata sheet. This includes information such as basic genome assembly/annotation stats, taxonomy, common NCBI metadata fields, etc. This will help all users select which genomes to include in their analyses in the future.
 
-Additionally, there are many [extra analyses](https://github.com/KScott6/GRAIN_Pipeline/blob/a51cc1b9470d76adadf37f83b2d9cc6fcba7c437/extra_analyses/README.md) you can run with your new genomic information. If you want to run [cano.py](https://github.com/KScott6/cano.py) and make phylogenomic trees with these genomes, you still need to run BUSCO and integrate the results into the database stats folder.
+Additionally, there are many [extra analyses](https://github.com/KScott6/GRAIN_Pipeline/blob/main/extra_analyses/README.md) you can run with your new genomic information. If you want to run [cano.py](https://github.com/KScott6/cano.py) and make phylogenomic trees with these genomes, you still need to run BUSCO and integrate the results into the database stats folder.
 
 
 
