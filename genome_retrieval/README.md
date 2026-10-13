@@ -107,7 +107,7 @@ python /project/arsef/scripts/download_ncbi_batches.py \
   --metadata /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_metadata_by_acc/new_genomes.accessions.NEW_ONLY.tsv \
   --outdir /project/arsef/projects/bulk_genome_annotation/genome_retrieval/7.1.26/ncbi_downloads \
   --with_annotation \
-  --api_key "d6926b64c92bae955bd32d96fe4fa7386408" # include your API key
+  --api_key "" # include your API key
 ```
 
 Options:
