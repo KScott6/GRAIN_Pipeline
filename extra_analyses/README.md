@@ -24,45 +24,78 @@ This walkthrough will show you how to run all of these analyses automatically, t
 
 ## BUSCO (fungi)
 
-I have made a [script](extra_analyses/scripts/make_busco_fungi_scripts.py) that automatically takes either 
+The make_busco_fungi_array.py script automatically generates and submits SLURM job arrays to run BUSCO analyses on fungal genomes in the MycoTools database. The BUSCO results are then automatically compiled into the combined metadata table. By default, the script skips genomes that already have valid BUSCO summary files stored in /project/arsef/databases/mycotools/database_stats/busco/fungi/short_summaries/. This script will automatically delete the very large busco miniprot logs files upon successful completion. 
 
-1) the mtdb produced when you run predb2mtdb, or
+The script accepts either:
 
-2) a file containing a list of ome codes, or 
+1) An .mtdb file produced by predb2mtdb, using --mtdb.
 
-3) literally any tsv/csv whose first column is a list of ome codes (no header). 
+2) A text file containing a list of OME codes, one per line, using -i.
 
-This script will then run a BUSCO analysis **(fungi_odb10)** on each genome. The fungi_odb10 is the hard-coded default because cano.py depends on these BUSCO results all using the same BUSCO database. Do not attempt to change the BUSCO dataset in this command. If you need to run a different BUSCO dataset on your genomes, you need to generate your own BUSCO commands.
+3) A headerless TSV file whose first column contains OME codes, using --mtdb.
+
+The script runs BUSCO in genome mode using fungi_odb10 on each genome. Th fungal_odb10 dataset is hard-coded because cano.py depends on the BUSCO results all using the same reference database. **Do not change the BUSCO dataset.** If you need to use a different BUSCO lineage dataset, generate separate BUSCO commands.
+
+Each OME is assigned to an individual task within a SLURM array. By default, the script allows 25 tasks to run concurrently.
+
+<br>
+
+To generate and automatically submit a BUSCO array from an MTDB file:
 
 ```bash
 module load miniconda
 
-python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_scripts.py -i /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260701/predb2mtdb.mtdb --submit --skip-existing --threads 36
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_array.py \
+    --mtdb /project/arsef/databases/mycotools/split_predb/predb2mtdb_20260701/predb2mtdb.mtdb \
+    --run-name busco_new_genomes \
+    --threads 16 \
+    --mem 96G \
+    --time 12:00:00 \
+    --concurrency 25 \
+    --submit
 ```
 
-`--submit` If specified, will automatically submit the generated scripts
+Alternatively, to use a list of OME codes:
+
+```bash
+python3 /project/arsef/databases/mycotools/scripts/make_busco_fungi_array.py \
+    -i /path/to/ome_list.txt \
+    --run-name busco_ome_list \
+    --submit
+```
+
+Options:
+
+`--mtdb`  Input MTDB file containing OME codes in its first column.
+
+`-i` or `--ome-list`  Input text file containing OME codes.
+
+`--submit`  Automatically submit the BUSCO array and its dependent summary-merging job.
+
+`--run-name`  Name assigned to the array run. If omitted, a timestamped name is generated.
+
+`--rerun` Rerun BUSCO even if an existing valid summary is present.
 
 `--skip-existing` If specified, the script will skip any ome that already has a short summary file in :short_summary in /project/arsef/databases/mycotools/database_stats/busco/fungi/by_ome/<ome>/<ome>/
 
-`--metaeuk` If specified, will use the Metaeuk gene predictor software rather than the default Miniprot. **only use this is you REALLY need BUSCO results for particular genomes**. I would prefer to keep the database with as much default parameters as possible. 
+`--threads` Number of CPUs allocated to each array task (default: 16).
 
-`--threads` Specify how many threads for slurm options
+`--mem` Total memory allocated per array task (default: 96G).
 
-`--mem-per-cpu` Specify how much mem per cpu for slurm options (example --mem-per-cpu 16G)
+    * Note : complicated, large, or low-quality genomes can consume a LOT of memory. Try with the default memory limit initally, then increase until the job successfully completes. I 1 TB memory is where I personally give up on any given genome.
 
-`--time` Specify job time limit for slurm options
+`--time` Maximum runtime per task (default: 12:00:00).
 
-This script checks the currently running jobs and will not submit a BUSCO job for an ome if there is already one running for that particular ome. 
+`--concurrency` Maximum number of array tasks running simultaneously (default: 25).
 
-This script will log any ome that did not successfully complete the BUSCO analyses, so that you can re-run them with more time/RAM. 
+`--merge-only`  Rebuild the combined BUSCO summary table from all existing individual summaries without running BUSCO again.
 
-After all the BUSCO jobs have completed, now you need to parse the BUSCO txt output with the BUSCO parsing script:
 
-```bash
-python /project/arsef/databases/mycotools/scripts/parse_busco_summaries.py
-```
+The script generates a new directory for each run under:
 
-This will automatically parse the folder with all the collected BUSCO results (/project/arsef/databases/mycotools/database_stats/busco/fungi/short_summaries) and compile all the info for every ome into a single file. If you don't see your ome in that file, it means either the BUSCO run was unsucessful, or the final summary file was not copied over (known issue for some omes, not sure why).
+/project/arsef/databases/mycotools/database_stats/busco/fungi/array_runs/<run_name>/
+
+This directory contains the OME manifest, generated SLURM scripts, lists of skipped genomes, and the submitted job IDs. If --submit is not specified, the scripts are generated but no jobs are submitted.
 
 <br>
 
@@ -70,51 +103,51 @@ This will automatically parse the folder with all the collected BUSCO results (/
 
 ## QUAST 
 
-The software QUAST generates basic genome statistics (N50, genome length, GC%, etc). 
+QUAST calculates basic genome assembly statistics, including N50, N90, total assembly length, GC%, contig counts, and other assembly quality metrics.
 
-The generate_quast_jobs.py script will generate and submit individual QUAST analyses on any given genome already in MycoTools. This script will take either:
+The make_quast_array.py script generates SLURM job arrays to run QUAST on multiple genomes in parallel and compiles the completed results into a single summary file. Duplicated genomes will automatically be skipped.
 
-1) a file containing a list of ome codes (--ome_list), or
+The script accepts two types of input:
 
-2) the mtdb used to integrate the omes into the MycoTools database (--mtdb), or
+1) -i or --ome-list: A text file containing ome codes, one per line.
 
-3) a command telling QUAST to run on all genomes in the MycoTools catalog that do not have QUAST results yet (--all_missing_quast).
+2) --mtdb: A MycoTools .mtdb file, such as the database generated when integrating new genomes. The script extracts ome codes from the first column.
 
-(!) note: Right now, this command depends on the ome already being in the catalog in order for the job to be submitted. I need to fix this. 
-
-```bash
-python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
-    --ome_list /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260330.mtdb \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_03.30.26.csv \
-    --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
-    --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs \
-    --output_base /project/arsef/databases/mycotools/database_stats/quast 
-
-python /project/arsef/databases/mycotools/scripts/generate_quast_jobs.py \
-    --all_missing_quast \
-    --catalog /project/arsef/databases/mycotools/MTDB_metadata_COMPLETE_08.18.26.csv \
-    --output_base /project/arsef/databases/mycotools/database_stats/quast \
-    --script_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_scripts \
-    --log_dir /project/arsef/databases/mycotools/database_stats/quast/__quast_logs
-```
-
-`--ome_list` Flag used to specify a single-column ome list input (.txt, .tsv, .csv...)
-
-`--mtdb` Flag used to specify a .mtdb file input
-
-`--all_missing_quast` Include this flag if you want to run QUAST on all genomes in the database that do not have QUAST metadata yet. 
-
-`--no_submit` Include if you want to inspect the generated quast jobs instead of automatically submitting them.
-
-After all the QUAST jobs have completed, now you need to parse the QUAST transposed reports with the QUAST parsing script:
+To run QUAST on genomes from a MycoTools .mtdb file:
 
 ```bash
-python /project/arsef/databases/mycotools/scripts/parse_quast_reports.py
+python /project/arsef/databases/mycotools/scripts/make_quast_array.py \
+  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20261023.mtdb \
+  --run-name quast_update_01 \
+  --concurrency 25 \
+  --threads 4 \
+  --time 04:00:00 \
+  --submit
 ```
 
-This script will automatically parse the folder with all the collected QUAST results (/project/arsef/databases/mycotools/database_stats/quast/individual_reports) and compile all the transposed reports into a single report file (/project/arsef/databases/mycotools/database_stats/quast/quast_summary_combined.tsv). This report will contain ALL the QUAST results of previous runs, as well as your most recently submitted jobs.
+Options: 
 
-Helpful logs of the missing reports/errors can be found here: /project/arsef/databases/mycotools/database_stats/quast/
+`-i , --ome_list` Input text file containing ome codes, one per line.
+
+`--mtdb` Input MycoTools .mtdb file. Ome codes are extracted from the first column.
+
+`submit` Automatically submits the QUAST array and schedules the report compilation job.
+
+`--run-name` Name assigned to the QUAST run and its output directory (Default: timestamp name).
+
+`--concurrency` Maximum number of QUAST array tasks running simultaneously (Default: 25).
+
+`--threads` Number of CPUs allocated to each QUAST task (Default: 4)
+
+`--rerun` Reanalyzes selected genomes even when valid QUAST reports already exist.
+
+Individual QUAST analyses are stored in: /project/arsef/databases/mycotools/database_stats/quast/by_ome/<OME>/
+
+Individual reports are stored in: /project/arsef/databases/mycotools/database_stats/quast/individual_reports/<OME>_transposed_report.tsv
+
+If any genomes in the submitted array fail to produce a valid report, their ome codes are recorded in: .../array_runs/<RUN_NAME>/missing_reports.txt
+
+QUAST report compilation is completely automated. When the job is submitted with --submit, a secondary slurm job is scheduled for when all the QUAST jobs complete. This job will merge all the results, both old and new, into the maseter quast results file:  /project/arsef/databases/mycotools/database_stats/quast/quast_summary_combined.tsv
 
 <br>
 
@@ -122,18 +155,40 @@ Helpful logs of the missing reports/errors can be found here: /project/arsef/dat
 
 ## annotationStats
 
-There is a built-in function in MycoTools that calculates annotation statistics. 
+There is a MycoTools function which calculates annotation statistics, including gene counts, CDS counts, transcript lengths, and other annotation metrics. The prepare_annotation_stats script will automatically create slurm jobs to easily run this command on any genome added into the database. 
 
-Point it at the whole MycoTools database to get the updated information. Make sure to provide the most up-to-date version of the MycoTools mtdb.
+The script will:
 
-This may take a few minutes on the login node (~5 minutes), especially if you're running it on the whole database.
+1) Read the current MycoTools database and compare its ome codes against the existing annotationStats master file.
+2) Identify genomes that have not yet been analyzed.
+3) Divide the new genomes into batches of 100.
+4) Automatically submit a SLURM job array to calculate annotation statistics.
+5) Schedule a separate SLURM job to validate and merge the results once the array finishes.
+6) Back up the existing master file before adding any new results.
+
+If all genomes have already been analyzed, the script exits without submitting any jobs.
 
 ```bash
-source activate /project/arsef/environments/mycotools/
-
-annotationStats /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20260701.mtdb > /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_07.1.26.tsv
-
+python /project/arsef/databases/mycotools/scripts/update_annotation_stats.py \
+  --mtdb /project/arsef/databases/mycotools/mycotoolsdb/mtdb/20261023.mtdb
 ```
+
+`--mtdb`  Path to the MycoTools database to analyze. Required for a new run.
+
+`--batch-size`  Number of genomes processed per SLURM array task (Default: 100).
+
+`--cpus`  CPUs per slurm job. Also controls how many mycotools:annotationStats worker processes (Default: 2).
+
+`--mem` Memory allocated per slurm job (Default: 16G).
+
+`--concurrency `  Max number of array tasks running simultaneously (Default: 10).
+
+`--resume`  Resume a previous run, rerunning only batches with missing or invalid results.
+
+`--merge` Validate and merge results from an existing run. Normally called automatically by the SLURM merge job, but if a run fails you should resume the run and specify --merge.
+
+The permanent annotationStats master file is located at:  /project/arsef/databases/mycotools/database_stats/annotation_stats/mtdb_annotation_stats_master.tsv
+
 
 <br>
 
