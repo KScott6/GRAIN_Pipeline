@@ -10,7 +10,7 @@ This walkthrough is designed for SCINet users in the arsef project.
 
 Step 1:  Retrieve genomes
 
-* assemble new genomes from your own WGS data, or
+* assemble new genomes from your own WGS data, such as with the [GenomeFlow Pipeline](https://github.com/KScott6/GenomeFlow) or
 * [download genomes from NCBI](https://github.com/KScott6/GRAIN_Pipeline/blob/main/genome_retrieval/README.md)
 
 Step 2:  Annotate genomes
